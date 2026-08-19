@@ -9,6 +9,9 @@ const reminders = require('./reminders');
 const Scheduler = require('./scheduler');
 const ScheduledReminders = require('./scheduled');
 const Overlay = require('./overlay');
+const prayer = require('./prayer');
+const PrayerAlerts = require('./prayer-alerts');
+const cities = require('./cities');
 
 const isMac = process.platform === 'darwin';
 const asset = (...p) => path.join(__dirname, '..', '..', 'assets', ...p);
@@ -18,6 +21,7 @@ let settingsWindow = null;
 let welcomeWindow = null;
 let scheduler = null;
 let scheduledReminders = null;
+let prayerAlerts = null;
 const overlay = new Overlay();
 
 // A second copy would mean two trays and two sets of breaks.
@@ -57,7 +61,41 @@ function fireScheduled(entry) {
       () => refreshTray(),
     );
   } else if (Notification.isSupported()) {
-    new Notification({ title: 'Rest', body: entry.label, silent: !store.load().playSound }).show();
+    new Notification({ title: 'Sakina', body: entry.label, silent: !store.load().playSound }).show();
+  }
+}
+
+function firePrayer(entry, isPreWarning) {
+  const s = store.load();
+  const at = prayer.formatTime(entry.time, s.location.tz);
+  const body = isPreWarning
+    ? `${entry.name} at ${at} — ${s.prayer.preWarnMin} minutes`
+    : `${entry.name} · ${at}`;
+
+  // A heads-up is meant to let you find a stopping point, so it stays a
+  // notification even when the prayer itself takes the screen.
+  if (s.prayer.style === 'fullscreen' && !isPreWarning) {
+    if (overlay.active) return;
+    overlay.show(
+      {
+        durationSec: 20,
+        phrase: { primary: entry.arabic, secondary: entry.name, meaning: at, rtl: true },
+        strictMode: false,
+        playSound: s.playSound,
+        title: 'Prayer',
+        subtitle: `${s.location.name} · ${at}`,
+      },
+      () => refreshTray(),
+    );
+    return;
+  }
+
+  if (Notification.isSupported()) {
+    new Notification({
+      title: isPreWarning ? 'Sakina — coming up' : 'Sakina',
+      body,
+      silent: !s.playSound,
+    }).show();
   }
 }
 
@@ -89,7 +127,7 @@ function createWindow(file, opts, ref) {
 function openSettings() {
   settingsWindow = createWindow(
     path.join(__dirname, '..', 'renderer', 'settings', 'index.html'),
-    { width: 720, height: 760, title: 'Rest Settings' },
+    { width: 720, height: 760, title: 'Sakina Settings' },
     settingsWindow,
   );
   settingsWindow.on('closed', () => { settingsWindow = null; });
@@ -99,7 +137,7 @@ function openSettings() {
 function openWelcome() {
   welcomeWindow = createWindow(
     path.join(__dirname, '..', 'renderer', 'welcome', 'index.html'),
-    { width: 640, height: 680, title: 'Welcome to Rest' },
+    { width: 640, height: 680, title: 'Welcome to Sakina' },
     welcomeWindow,
   );
   welcomeWindow.on('closed', () => { welcomeWindow = null; });
@@ -134,10 +172,38 @@ function statusLine() {
   return `Next break in ${Math.ceil(left / 60)} min`;
 }
 
+function prayerMenuItems() {
+  const s = store.load();
+  if (!s.prayer.enabled || !s.location) return [];
+  const times = prayer.timesFor(0);
+  if (!times) return [];
+
+  const upcoming = prayer.next();
+  const items = times.map((p) => ({
+    label: `${p.notAPrayer ? '  ' : ''}${p.name}${'\u2003'}${prayer.formatTime(p.time, s.location.tz)}` +
+           (upcoming && upcoming.key === p.key ? '   ←' : ''),
+    enabled: false,
+  }));
+
+  return [
+    { type: 'separator' },
+    { label: `${s.location.name} · ${prayer.countdownLabel() || ''}`, enabled: false },
+    ...items,
+  ];
+}
+
 function refreshTray() {
   if (!tray) return;
   tray.setImage(trayImage(scheduler.paused));
-  tray.setToolTip(`Rest — ${statusLine()}`);
+
+  const s = store.load();
+  const countdown = (s.prayer.enabled && s.prayer.showInMenuBar && s.location)
+    ? prayer.countdownLabel() : null;
+
+  // Only macOS puts text beside a tray icon; on Windows it goes in the tooltip.
+  if (isMac) tray.setTitle(countdown ? ` ${countdown}` : '');
+  tray.setToolTip(countdown ? `Sakina — ${statusLine()} · ${countdown}`
+                            : `Sakina — ${statusLine()}`);
 
   const next = reminders.peek();
   const menu = Menu.buildFromTemplate([
@@ -153,9 +219,10 @@ function refreshTray() {
     next
       ? { label: `Next: ${(next.secondary || next.primary).slice(0, 42)}`, enabled: false }
       : { label: 'No phrases enabled', enabled: false },
+    ...prayerMenuItems(),
     { type: 'separator' },
     { label: 'Settings…', click: openSettings },
-    { label: 'Quit Rest', accelerator: isMac ? 'Command+Q' : undefined, click: () => app.quit() },
+    { label: 'Quit Sakina', accelerator: isMac ? 'Command+Q' : undefined, click: () => app.quit() },
   ]);
   tray.setContextMenu(menu);
 }
@@ -182,10 +249,34 @@ ipcMain.handle('settings:set', (_e, patch) => {
   return after;
 });
 
+ipcMain.handle('cities:search', (_e, query) => cities.search(query));
+
+ipcMain.handle('prayer:today', () => {
+  const s = store.load();
+  if (!s.location) return null;
+  const times = prayer.timesFor(0);
+  if (!times) return null;
+  return {
+    location: s.location,
+    next: (prayer.next() || {}).key || null,
+    times: times.map((p) => ({
+      key: p.key, name: p.name, arabic: p.arabic, notAPrayer: !!p.notAPrayer,
+      at: prayer.formatTime(p.time, s.location.tz),
+    })),
+  };
+});
+
+ipcMain.handle('prayer:methods', () => prayer.METHODS);
+
 ipcMain.handle('settings:preview', () => { if (!overlay.active) startBreak(); });
 ipcMain.handle('settings:openDataFile', () => shell.showItemInFolder(store.file()));
 ipcMain.handle('welcome:done', (_e, patch) => {
-  store.save({ ...patch, firstRunComplete: true });
+  // The welcome screen sends only the handful of fields it asks about, so the
+  // nested prayer object is merged rather than replaced.
+  const merged = { ...patch, firstRunComplete: true };
+  if (patch.prayer) merged.prayer = { ...store.load().prayer, ...patch.prayer };
+  if (patch.location == null) delete merged.location;
+  store.save(merged);
   if (patch.launchAtLogin != null) {
     app.setLoginItemSettings({ openAtLogin: !!patch.launchAtLogin, openAsHidden: true });
   }
@@ -205,7 +296,7 @@ app.on('browser-window-closed', maybeHideDock);
 
 app.whenReady().then(() => {
   if (isMac) app.dock?.hide(); // menu-bar app, no Dock icon
-  if (!isMac) app.setAppUserModelId('com.anasabuamar.rest');
+  if (!isMac) app.setAppUserModelId('com.anasabuamar.sakina');
 
   scheduler = new Scheduler({ onBreakDue: startBreak, onChange: () => {} });
   scheduler.start();
@@ -213,13 +304,24 @@ app.whenReady().then(() => {
   scheduledReminders = new ScheduledReminders(fireScheduled);
   scheduledReminders.start();
 
+  prayerAlerts = new PrayerAlerts(firePrayer);
+  prayerAlerts.start();
+
   tray = new Tray(trayImage(false));
   refreshTray();
   if (!isMac) tray.on('click', () => tray.popUpContextMenu());
 
   // Refresh the countdown in the tooltip without rebuilding the menu every
   // second — the menu is rebuilt only when it can actually be seen.
-  setInterval(() => { if (tray) tray.setToolTip(`Rest — ${statusLine()}`); }, 5000);
+  setInterval(() => {
+    if (!tray) return;
+    const s = store.load();
+    const countdown = (s.prayer.enabled && s.prayer.showInMenuBar && s.location)
+      ? prayer.countdownLabel() : null;
+    if (isMac) tray.setTitle(countdown ? ` ${countdown}` : '');
+    tray.setToolTip(countdown ? `Sakina — ${statusLine()} · ${countdown}`
+                              : `Sakina — ${statusLine()}`);
+  }, 20000);
 
   if (!store.load().firstRunComplete) openWelcome();
 });
@@ -227,4 +329,5 @@ app.whenReady().then(() => {
 app.on('before-quit', () => {
   scheduler?.stop();
   scheduledReminders?.stop();
+  prayerAlerts?.stop();
 });

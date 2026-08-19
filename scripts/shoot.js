@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const { app, BrowserWindow } = require('electron');
 const reminders = require('../src/main/reminders');
+const adhan = require('adhan');
 
 const out = process.env.REST_SHOT_DIR || path.join(__dirname, '..', 'shots');
 const root = path.join(__dirname, '..');
@@ -23,11 +24,39 @@ const state = {
     ],
     skipWhenAway: true, waitWhilePresenting: true, strictMode: false,
     playSound: false, launchAtLogin: true, cursor: 0, firstRunComplete: true,
+    location: { name: 'Waterville', region: 'Maine', country: 'United States',
+                lat: 44.5521, lon: -69.6317, tz: 'America/New_York' },
+    prayer: {
+      enabled: true, method: 'NorthAmerica', madhab: 'shafi',
+      alerts: { fajr: true, dhuhr: true, asr: true, maghrib: false, isha: true },
+      style: 'notification', preWarnMin: 10, showInMenuBar: true,
+    },
   },
   builtIn: { adhkar: reminders.ADHKAR, quotes: reminders.QUOTES },
   platform: process.platform,
-  version: '1.0.0',
+  version: '1.1.0',
 };
+
+// Real computed times rather than invented ones, so the screenshot shows what
+// the app would actually display.
+const TZ = 'America/New_York';
+const params = adhan.CalculationMethod.NorthAmerica();
+params.madhab = adhan.Madhab.Shafi;
+const pt = new adhan.PrayerTimes(new adhan.Coordinates(44.5521, -69.6317), new Date(), params);
+const fmt = (d) => new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit', timeZone: TZ }).format(d);
+const prayerToday = {
+  location: state.settings.location,
+  next: 'asr',
+  times: [
+    { key: 'fajr', name: 'Fajr', arabic: 'الفجر', at: fmt(pt.fajr) },
+    { key: 'sunrise', name: 'Sunrise', arabic: 'الشروق', notAPrayer: true, at: fmt(pt.sunrise) },
+    { key: 'dhuhr', name: 'Dhuhr', arabic: 'الظهر', at: fmt(pt.dhuhr) },
+    { key: 'asr', name: 'Asr', arabic: 'العصر', at: fmt(pt.asr) },
+    { key: 'maghrib', name: 'Maghrib', arabic: 'المغرب', at: fmt(pt.maghrib) },
+    { key: 'isha', name: 'Isha', arabic: 'العشاء', at: fmt(pt.isha) },
+  ],
+};
+const methods = require('../src/main/prayer').METHODS;
 
 const shots = [
   ['break-adhkar', 'src/renderer/break/index.html', 1440, 900, {
@@ -41,7 +70,7 @@ const shots = [
     phrase: reminders.QUOTES[1],
   }],
   ['settings', 'src/renderer/settings/index.html', 720, 860, null],
-  ['welcome', 'src/renderer/welcome/index.html', 640, 760, null],
+  ['welcome', 'src/renderer/welcome/index.html', 640, 860, null],
 ];
 
 app.commandLine.appendSwitch('force-color-profile', 'srgb');
@@ -54,7 +83,7 @@ app.whenReady().then(async () => {
   fs.mkdirSync(out, { recursive: true });
   try {
   for (const [name, file, width, height, breakPayload] of shots) {
-    process.env.REST_FIXTURE = JSON.stringify({ state, breakPayload });
+    process.env.REST_FIXTURE = JSON.stringify({ state, breakPayload, prayerToday, methods });
     const win = new BrowserWindow({
       width, height, show: false, backgroundColor: '#12151F',
       webPreferences: {

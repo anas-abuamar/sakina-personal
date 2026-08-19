@@ -1,7 +1,7 @@
 {
-  "name": "rest",
+  "name": "sakina",
   "version": "1.0.0",
-  "description": "Gentle 20-20-20 eye-break reminders for macOS and Windows, with adhkar, quotes, and your own phrases.",
+  "description": "Eye breaks and prayer times for macOS and Windows — a quiet pause on a timer, with adhkar, sourced quotes, and your own phrases.",
   "main": "src/main/index.js",
   "author": "Anas Abuamar",
   "license": "MIT",
@@ -20,24 +20,41 @@
     "sharp": "^0.33.5"
   },
   "build": {
-    "appId": "com.anasabuamar.rest",
-    "productName": "Rest",
-    "directories": { "buildResources": "build" },
-    "files": ["src/**/*", "assets/**/*", "package.json"],
+    "appId": "com.anasabuamar.sakina",
+    "productName": "Sakina",
+    "directories": {
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
     "mac": {
       "category": "public.app-category.healthcare-fitness",
       "icon": "build/icon.icns",
-      "target": ["dmg", "zip"],
-      "extendInfo": { "LSUIElement": 1 }
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "extendInfo": {
+        "LSUIElement": 1
+      }
     },
     "win": {
       "icon": "build/icon.ico",
-      "target": ["nsis", "portable"]
+      "target": [
+        "nsis",
+        "portable"
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Rest"
+      "shortcutName": "Sakina"
     }
+  },
+  "dependencies": {
+    "adhan": "4.4.3"
   }
 }

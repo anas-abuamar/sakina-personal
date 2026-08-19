@@ -17,6 +17,18 @@ const DEFAULTS = {
   strictMode: false,
   scheduled: [],
   firstRunComplete: false,
+
+  // null until a city is chosen; { name, region, country, lat, lon, tz }
+  location: null,
+  prayer: {
+    enabled: false,
+    method: 'MuslimWorldLeague',
+    madhab: 'shafi',
+    alerts: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true },
+    style: 'notification',   // or 'fullscreen'
+    preWarnMin: 10,          // 0 turns the heads-up off
+    showInMenuBar: true,
+  },
 };
 
 let cache = null;
@@ -28,6 +40,8 @@ const file = () => path.join(app.getPath('userData'), 'settings.json');
 function merge(saved) {
   const out = { ...DEFAULTS, ...saved };
   out.packs = { ...DEFAULTS.packs, ...(saved.packs || {}) };
+  out.prayer = { ...DEFAULTS.prayer, ...(saved.prayer || {}) };
+  out.prayer.alerts = { ...DEFAULTS.prayer.alerts, ...((saved.prayer || {}).alerts || {}) };
   out.customPhrases = Array.isArray(saved.customPhrases) ? saved.customPhrases : [];
   out.scheduled = Array.isArray(saved.scheduled) ? saved.scheduled : [];
   return out;

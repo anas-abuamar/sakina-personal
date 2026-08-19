@@ -7,6 +7,8 @@ const DURATIONS = [20, 30, 45, 60];
 
 let state = null;
 let draftDays = [];
+let methods = [];
+let searchSeq = 0;
 
 const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -117,6 +119,93 @@ function renderDayPicker() {
   });
 }
 
+async function renderPrayerToday() {
+  const host = el('prayer-today');
+  const today = await window.rest.prayerToday();
+  host.replaceChildren();
+  if (!today) {
+    host.appendChild(make('div', 'empty', 'Pick a location to see today\u2019s times.'));
+    return;
+  }
+  host.appendChild(make('div', 'block-head',
+    `Today \u00b7 ${today.location.name}`));
+  const grid = make('div', 'times');
+  for (const p of today.times) {
+    const cell = make('div', `time${p.key === today.next ? ' next' : ''}${p.notAPrayer ? ' info' : ''}`);
+    cell.appendChild(make('div', 'n', p.name));
+    cell.appendChild(make('div', 'v', p.at));
+    grid.appendChild(cell);
+  }
+  host.appendChild(grid);
+
+  host.appendChild(make('div', 'block-head', 'Remind me at'));
+  const toggles = make('div');
+  for (const p of today.times.filter((x) => !x.notAPrayer)) {
+    const row = make('div', 'row');
+    const label = make('div', 'label');
+    label.appendChild(make('b', null, `${p.name}  ${p.arabic}`));
+    row.appendChild(label);
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = state.settings.prayer.alerts[p.key] !== false;
+    box.addEventListener('change', () => commit({
+      prayer: { ...state.settings.prayer,
+                alerts: { ...state.settings.prayer.alerts, [p.key]: box.checked } },
+    }));
+    row.appendChild(box);
+    toggles.appendChild(row);
+  }
+  host.appendChild(toggles);
+}
+
+function renderCityResults(list) {
+  const host = el('city-results');
+  host.replaceChildren();
+  for (const city of list) {
+    const row = make('div', 'result');
+    row.appendChild(document.createTextNode(city.name));
+    row.appendChild(make('small', null,
+      [city.region, city.country].filter(Boolean).join(', ') + ` · ${city.tz}`));
+    row.addEventListener('click', async () => {
+      await commit({ location: {
+        name: city.name, region: city.region, country: city.country,
+        lat: city.lat, lon: city.lon, tz: city.tz,
+      } });
+      el('city-search').value = '';
+      host.replaceChildren();
+    });
+    host.appendChild(row);
+  }
+}
+
+function renderPrayer() {
+  const p = state.settings.prayer;
+  el('prayer-enabled').checked = !!p.enabled;
+  el('prayer-body').hidden = !p.enabled;
+
+  fillSelect(el('prayer-method'), methods.map((m) => m[0]), p.method,
+    (key) => (methods.find((m) => m[0] === key) || [key, key])[1]);
+  el('prayer-madhab').value = p.madhab || 'shafi';
+  el('prayer-style').value = p.style || 'notification';
+  el('prayer-prewarn').value = String(p.preWarnMin ?? 10);
+  el('prayer-menubar').checked = p.showInMenuBar !== false;
+  el('menubar-note').textContent = state.platform === 'darwin'
+    ? 'A countdown beside the icon, e.g. \u201cAsr in 42m\u201d.'
+    : 'Windows has no room for text in the tray \u2014 it goes in the tooltip.';
+
+  const current = el('city-current');
+  current.replaceChildren();
+  if (state.settings.location) {
+    const loc = state.settings.location;
+    current.appendChild(document.createTextNode('Using '));
+    current.appendChild(make('b', null, loc.name));
+    current.appendChild(document.createTextNode(
+      ` — ${[loc.region, loc.country].filter(Boolean).join(', ')} · ${loc.tz}`));
+  }
+
+  if (p.enabled) renderPrayerToday();
+}
+
 function render() {
   const s = state.settings;
 
@@ -139,11 +228,12 @@ function render() {
     ? 'Postpone while something holds the display awake — video, calls, screen sharing.'
     : 'Postpone during presentation mode, full-screen apps, and Focus Assist.';
 
-  el('version').textContent = `Rest ${state.version}`;
+  el('version').textContent = `Sakina ${state.version}`;
 
   renderCustom();
   renderScheduled();
   renderDayPicker();
+  renderPrayer();
 }
 
 function wire() {
@@ -197,12 +287,39 @@ function wire() {
     renderDayPicker();
   });
 
+  el('prayer-enabled').addEventListener('change', (e) =>
+    commit({ prayer: { ...state.settings.prayer, enabled: e.target.checked } }));
+
+  for (const [id, key, cast] of [
+    ['prayer-method', 'method', String],
+    ['prayer-madhab', 'madhab', String],
+    ['prayer-style', 'style', String],
+    ['prayer-prewarn', 'preWarnMin', Number],
+  ]) {
+    el(id).addEventListener('change', (e) =>
+      commit({ prayer: { ...state.settings.prayer, [key]: cast(e.target.value) } }));
+  }
+
+  el('prayer-menubar').addEventListener('change', (e) =>
+    commit({ prayer: { ...state.settings.prayer, showInMenuBar: e.target.checked } }));
+
+  // Sequence-guarded: results from a stale keystroke must never overwrite the
+  // list for what is currently typed.
+  el('city-search').addEventListener('input', async (e) => {
+    const seq = ++searchSeq;
+    const query = e.target.value;
+    if (query.trim().length < 2) { el('city-results').replaceChildren(); return; }
+    const list = await window.rest.searchCities(query);
+    if (seq === searchSeq) renderCityResults(list);
+  });
+
   el('preview').addEventListener('click', () => window.rest.preview());
   el('reveal').addEventListener('click', () => window.rest.openDataFile());
 }
 
 (async () => {
   state = await window.rest.get();
+  methods = await window.rest.prayerMethods();
   wire();
   render();
 })();

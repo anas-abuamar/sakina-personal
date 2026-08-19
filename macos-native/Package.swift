@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "Rest",
+    name: "Sakina",
     platforms: [.macOS(.v13)],
     targets: [
         .executableTarget(
-            name: "Rest",
-            path: "Sources/Rest",
+            name: "Sakina",
+            path: "Sources/Sakina",
             linkerSettings: [
                 .linkedFramework("AppKit"),
                 .linkedFramework("IOKit"),

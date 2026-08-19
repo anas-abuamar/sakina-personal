@@ -7,4 +7,7 @@ contextBridge.exposeInMainWorld('rest', {
   preview: () => ipcRenderer.invoke('settings:preview'),
   openDataFile: () => ipcRenderer.invoke('settings:openDataFile'),
   finishWelcome: (patch) => ipcRenderer.invoke('welcome:done', patch),
+  searchCities: (q) => ipcRenderer.invoke('cities:search', q),
+  prayerToday: () => ipcRenderer.invoke('prayer:today'),
+  prayerMethods: () => ipcRenderer.invoke('prayer:methods'),
 });

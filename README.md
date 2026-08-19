@@ -1,16 +1,20 @@
 <div align="center">
   <img src="build/icon.png" width="104" alt="">
-  <h1>Rest</h1>
-  <p><em>Every twenty minutes, look at something twenty feet away for twenty seconds.</em></p>
+  <h1>Sakina · سكينة</h1>
+  <p><em>Stillness, on a timer.</em></p>
 </div>
 
-Rest is a menu-bar / system-tray app for **macOS and Windows**. On a timer, every
-display dims, a ring counts down, and a phrase sits underneath it — an Arabic
-dhikr, a line on rest and attention, or something you wrote yourself. When the
-ring closes, it lets you back.
+Sakina is a menu-bar / system-tray app for **macOS and Windows** that interrupts
+you on purpose. Every twenty minutes or so, every display dims, a ring counts
+down, and a phrase sits underneath it — an Arabic dhikr, a line on rest and
+attention, or something you wrote yourself. When the ring closes, it lets you
+back.
 
-It exists because the 20-20-20 rule is trivial advice and impossible to keep:
-nothing about staring at a screen reminds you to stop staring at a screen.
+It also knows the five prayer times where you are, and can tell you before each
+one arrives.
+
+Both halves exist for the same reason: nothing about staring at a screen
+reminds you to stop staring at a screen.
 
 ![A break screen showing a dhikr](docs/screenshots/break-adhkar.png)
 
@@ -36,17 +40,40 @@ on Windows SmartScreen.
 
 | | |
 | --- | --- |
-| **Breaks** | Every 15–60 min, for 20–60 seconds. Every display, above full-screen apps. |
+| **Eye breaks** | Every 15–60 min, for 20–60 seconds. Every display, above full-screen apps. |
+| **Prayer times** | Fajr through Isha for your city, with a heads-up before each. |
 | **Phrases** | 9 adhkar with transliteration, 8 sourced quotes, plus anything you add. |
-| **Timed reminders** | Separate from the cycle — "Dhuhr at 13:00", as a notification or a full screen. |
+| **Timed reminders** | Your own, at a clock time — as a notification or a full screen. |
 | **Skips** | Won't interrupt you when you're away, presenting, or on a call. |
 | **Strict mode** | Removes the Esc shortcut when you don't trust yourself. |
 
 **Esc** skips a break. The overlay takes keyboard focus on purpose, so whatever
 you type during a break lands nowhere instead of in your document.
 
-Nothing leaves your machine. There is no account, no network call, and no
-analytics — settings are a JSON file you can open from the settings window.
+**Nothing leaves your machine.** No account, no network call, no analytics —
+prayer times are computed locally and the city list ships with the app. Settings
+are a JSON file you can open from the settings window.
+
+## Prayer times
+
+Computed on-device with [adhan](https://github.com/batoulapps/adhan-js), so they
+work on a plane with the wifi off.
+
+- **13 calculation methods** — Muslim World League, ISNA, Umm al-Qura, Karachi,
+  Diyanet, and the rest. Use whichever your local mosque follows.
+- **Both Asr opinions** — standard (Shafiʼi, Maliki, Hanbali) or Hanafi.
+- **Per-prayer** toggles, so Fajr can stay silent while the rest don't.
+- **A heads-up** 5–20 minutes before, as a notification, so you can find a
+  stopping point instead of being interrupted cold.
+- **In the menu bar** — "Asr in 42m" beside the icon. macOS only; Windows has no
+  room for text in the tray, so it goes in the tooltip.
+
+![Prayer times in settings](docs/screenshots/settings-3.png)
+
+Your city is chosen from a bundled list of ~34,000 places, matched by prefix and
+insensitive to accents, so *krako* finds *Kraków*. The list loads on first
+search rather than at startup — a tray app has no business parsing two megabytes
+to show a menu.
 
 ## The phrases
 
@@ -59,8 +86,6 @@ instead of the same two lines all morning.
   *traditionally* attributed, it says so rather than implying a citation that
   doesn't exist.
 - **Your own** — any text, with an optional right-to-left toggle.
-
-![Settings](docs/screenshots/settings-1.png)
 
 ## The two guards
 
@@ -92,7 +117,8 @@ break you'd rather have deferred, never a break that silently stops happening.
 ## Platform status
 
 **macOS** — developed and verified here. The overlay is confirmed reaching the
-screen at screen-saver level across every display, and clearing afterwards.
+screen at screen-saver level across every display and clearing afterwards, and
+the prayer engine is checked against known times for several cities.
 
 **Windows** — built from the documented APIs but **not yet exercised on a
 Windows machine**. Everything except the presenting check is platform-neutral
@@ -103,35 +129,55 @@ Windows itself needs nothing extra.
 ## Development
 
 ```bash
-npm start                 # run it
-npm run icons             # regenerate icons from assets/*.svg
-npx electron scripts/shoot.js   # screenshot every window to shots/
+npm start                        # run it
+npm run icons                    # regenerate icons from assets/*.svg
+npx electron scripts/shoot.js    # screenshot every window to shots/
 ```
 
 That last one matters more than it looks. The only other way to check the break
 screen is to black out every display and wait twenty seconds, which is useless
-when you're iterating on a layout — it's how the phrase-sizing bug in these
-screenshots got caught.
+when you're iterating on a layout — it's how the phrase-sizing bug and a
+show/hide bug in these screenshots got caught.
 
 ```
-src/main/       scheduler, tray, overlay windows, presence checks
-src/preload/    the two-verb bridge into each renderer
+src/main/       scheduler, tray, overlay windows, prayer engine, presence checks
+src/preload/    the narrow bridge into each renderer
 src/renderer/   break screen, settings, first-run
+data/           bundled city list (see Credits)
 macos-native/   see below
+```
+
+`adhan` is pinned to **4.4.3** on purpose: 4.4.4 ships `"type": "module"` while
+its own CommonJS build still uses `require()`, so `require('adhan')` throws
+*"exports is not defined in ES module scope"* in Electron's main process.
+
+To rebuild the city list, download `cities15000.txt`, `countryInfo.txt`, and
+`admin1CodesASCII.txt` from [GeoNames](https://download.geonames.org/export/dump/),
+then:
+
+```bash
+node scripts/build-cities.js <dir-with-those-files> data/cities.json
 ```
 
 ## macos-native
 
-A separate, self-contained Swift/AppKit implementation of the same idea, built
-before the cross-platform one. ~700 lines, no runtime, launches instantly:
+A separate, self-contained Swift/AppKit implementation of the eye-break half,
+written before the cross-platform one. ~700 lines, no runtime, launches
+instantly:
 
 ```bash
 cd macos-native && make run
 ```
 
-It has the breaks, the adhkar and the two guards, but not the custom phrases,
-timed reminders, or settings window — those live only in the Electron app. Keep
-it if you want the lighter native thing on a Mac; ignore it otherwise.
+It has the breaks, the adhkar and the two guards — but no prayer times, custom
+phrases, timed reminders, or settings window. Keep it if you want the lighter
+native thing on a Mac; ignore it otherwise.
+
+## Credits
+
+- Prayer times: [adhan-js](https://github.com/batoulapps/adhan-js) by Batoul Apps (MIT).
+- City data: [GeoNames](https://www.geonames.org), licensed
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ## License
 

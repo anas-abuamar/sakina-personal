@@ -40,3 +40,40 @@
 .footer { display: flex; align-items: center; gap: 10px; margin-top: 28px;
           padding-top: 18px; border-top: 1px solid var(--line); }
 .footer .faint { margin-left: auto; }
+
+/* Prayer times ---------------------------------------------------------- */
+
+.field { display: block; }
+.field-label { display: block; font-size: 12px; color: var(--ink-faint);
+               margin-bottom: 6px; font-weight: 600; letter-spacing: 0.04em;
+               text-transform: uppercase; }
+
+.results:empty { display: none; }
+.results {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--panel-hi);
+}
+.result { padding: 9px 12px; cursor: pointer; font-size: 13px; }
+.result:hover, .result.active { background: var(--accent); color: var(--accent-ink); }
+.result small { display: block; opacity: 0.7; font-size: 11.5px; }
+
+.current:empty { display: none; }
+.current { font-size: 13px; color: var(--ink-dim); padding-top: 2px; }
+.current b { color: var(--ink); font-weight: 600; }
+
+.times { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+         background: var(--line); border-radius: 9px; overflow: hidden; margin: 10px 0; }
+.time { background: var(--panel); padding: 11px 12px; }
+.time .n { font-size: 12px; color: var(--ink-faint); }
+.time .v { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.time.next { background: var(--panel-hi); }
+.time.next .n { color: var(--accent); }
+.time.info .v { font-weight: 500; color: var(--ink-dim); }
+
+.block-head {
+  font-size: 11.5px; font-weight: 650; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-faint);
+  padding: 12px 0 2px;
+}

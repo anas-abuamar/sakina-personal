@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;">
-  <title>Welcome to Rest</title>
+  <title>Welcome to Sakina</title>
   <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="../settings/settings.css">
   <link rel="stylesheet" href="welcome.css">
 </head>
 <body>
@@ -13,7 +14,7 @@
   <div class="wrap narrow">
     <div class="hero">
       <img src="../../../build/icon.png" alt="" width="76" height="76">
-      <h1>Rest</h1>
+      <h1>Sakina</h1>
       <p class="muted">Every so often, every screen dims and asks you to look
         at something far away. Twenty seconds later it lets you back.</p>
     </div>
@@ -41,6 +42,21 @@
     </section>
 
     <section>
+      <h2>Prayer times</h2>
+      <div class="card">
+        <div class="row">
+          <div class="label"><b>Remind me at prayer times</b><span>Worked out on this machine — no lookup, no account.</span></div>
+          <input type="checkbox" id="prayer-enabled">
+        </div>
+      </div>
+      <div class="adder card" id="prayer-where" hidden>
+        <input type="text" id="city-search" placeholder="Your city — e.g. Waterville" autocomplete="off">
+        <div id="city-results" class="results"></div>
+        <div id="city-current" class="current"></div>
+      </div>
+    </section>
+
+    <section>
       <div class="card">
         <div class="row">
           <div class="label"><b>Launch at login</b><span>A reminder you have to start yourself isn't one.</span></div>
@@ -51,7 +67,7 @@
 
     <div class="actions">
       <button class="primary big" id="done">Start</button>
-      <p class="faint">Rest lives in your <span id="where">menu bar</span>. Nothing is sent anywhere.</p>
+      <p class="faint">Sakina lives in your <span id="where">menu bar</span>. Nothing is sent anywhere.</p>
     </div>
   </div>
   <script src="welcome.js"></script>

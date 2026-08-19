@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;">
-  <title>Rest Settings</title>
+  <title>Sakina Settings</title>
   <link rel="stylesheet" href="../shared.css">
   <link rel="stylesheet" href="settings.css">
 </head>
 <body>
   <div class="titlebar"></div>
   <div class="wrap">
-    <h1>Rest</h1>
+    <h1>Sakina</h1>
     <p class="muted">Eye breaks, on the 20-20-20 rule.</p>
 
     <section>
@@ -80,6 +80,64 @@
     </section>
 
     <section>
+      <h2>Prayer times</h2>
+      <div class="card">
+        <div class="row">
+          <div class="label"><b>Remind me at prayer times</b><span>Calculated on this machine — nothing is looked up online.</span></div>
+          <input type="checkbox" id="prayer-enabled">
+        </div>
+      </div>
+
+      <div id="prayer-body" hidden>
+        <div class="adder card">
+          <label class="field">
+            <span class="field-label">Location</span>
+            <input type="text" id="city-search" placeholder="Type a city — e.g. Waterville" autocomplete="off">
+          </label>
+          <div id="city-results" class="results"></div>
+          <div id="city-current" class="current"></div>
+        </div>
+
+        <div class="card">
+          <div class="row">
+            <div class="label"><b>Calculation method</b><span>Use whichever your local mosque follows.</span></div>
+            <select id="prayer-method"></select>
+          </div>
+          <div class="row">
+            <div class="label"><b>Asr</b><span>Hanafi calculates Asr later than the other schools.</span></div>
+            <select id="prayer-madhab">
+              <option value="shafi">Standard (Shafiʼi, Maliki, Hanbali)</option>
+              <option value="hanafi">Hanafi</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="label"><b>How to tell me</b><span>Full screen is the same overlay the eye breaks use.</span></div>
+            <select id="prayer-style">
+              <option value="notification">Notification</option>
+              <option value="fullscreen">Cover the screen</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="label"><b>Heads-up before</b><span>A quiet warning so you can find a stopping point.</span></div>
+            <select id="prayer-prewarn">
+              <option value="0">Off</option>
+              <option value="5">5 minutes</option>
+              <option value="10">10 minutes</option>
+              <option value="15">15 minutes</option>
+              <option value="20">20 minutes</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="label"><b>Show next prayer in the menu bar</b><span id="menubar-note"></span></div>
+            <input type="checkbox" id="prayer-menubar">
+          </div>
+        </div>
+
+        <div class="card" id="prayer-today"></div>
+      </div>
+    </section>
+
+    <section>
       <h2>Behaviour</h2>
       <div class="card">
         <div class="row">
@@ -99,7 +157,7 @@
           <input type="checkbox" id="playSound">
         </div>
         <div class="row">
-          <div class="label"><b>Launch at login</b><span>Start Rest automatically when you sign in.</span></div>
+          <div class="label"><b>Launch at login</b><span>Start Sakina automatically when you sign in.</span></div>
           <input type="checkbox" id="launchAtLogin">
         </div>
       </div>

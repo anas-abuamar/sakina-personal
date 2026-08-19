@@ -14,6 +14,10 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* Any element given a display rule by its class would otherwise ignore the
+   hidden attribute, which is how the app shows and hides whole sections. */
+[hidden] { display: none !important; }
+
 body {
   background: var(--bg);
   color: var(--ink);
