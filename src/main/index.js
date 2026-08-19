@@ -30,6 +30,16 @@ if (!app.requestSingleInstanceLock()) app.quit();
 // ---------------------------------------------------------------- breaks
 
 function startBreak() {
+  // The scheduler has already marked a break in progress by the time we get
+  // here. If something else owns the screen, Overlay.show() would return early
+  // without ever calling onFinish — leaving breakActive stuck true and killing
+  // every future eye break. Hand the clock back instead and retry shortly.
+  if (overlay.active) {
+    scheduler.snooze(60);
+    refreshTray();
+    return;
+  }
+
   const s = store.load();
   const phrase = reminders.advance();
   overlay.show(
@@ -47,8 +57,9 @@ function startBreak() {
 }
 
 function fireScheduled(entry) {
-  if (entry.fullScreen) {
-    if (overlay.active) return;
+  // Same rule as prayers: if the screen is busy, degrade to a notification
+  // rather than dropping the reminder on the floor.
+  if (entry.fullScreen && !overlay.active) {
     overlay.show(
       {
         durationSec: Math.max(5, entry.durationSec || 15),
@@ -67,15 +78,19 @@ function fireScheduled(entry) {
 
 function firePrayer(entry, isPreWarning) {
   const s = store.load();
-  const at = prayer.formatTime(entry.time, s.location.tz);
+  const loc = prayer.usableLocation(s.location);
+  if (!loc) return;
+  const at = prayer.formatTime(entry.time, loc.tz);
   const body = isPreWarning
     ? `${entry.name} at ${at} — ${s.prayer.preWarnMin} minutes`
     : `${entry.name} · ${at}`;
 
   // A heads-up is meant to let you find a stopping point, so it stays a
   // notification even when the prayer itself takes the screen.
-  if (s.prayer.style === 'fullscreen' && !isPreWarning) {
-    if (overlay.active) return;
+  // Fall through to a notification rather than returning: the alert is already
+  // stamped as delivered, so a silent return means the prayer is missed for the
+  // day with no trace anywhere.
+  if (s.prayer.style === 'fullscreen' && !isPreWarning && !overlay.active) {
     overlay.show(
       {
         durationSec: 20,
@@ -83,7 +98,7 @@ function firePrayer(entry, isPreWarning) {
         strictMode: false,
         playSound: s.playSound,
         title: 'Prayer',
-        subtitle: `${s.location.name} · ${at}`,
+        subtitle: `${loc.name} · ${at}`,
       },
       () => refreshTray(),
     );
@@ -174,7 +189,7 @@ function statusLine() {
 
 function prayerMenuItems() {
   const s = store.load();
-  if (!s.prayer.enabled || !s.location) return [];
+  if (!s.prayer.enabled || !prayer.usableLocation(s.location)) return [];
   const times = prayer.timesFor(0);
   if (!times) return [];
 
@@ -197,7 +212,8 @@ function refreshTray() {
   tray.setImage(trayImage(scheduler.paused));
 
   const s = store.load();
-  const countdown = (s.prayer.enabled && s.prayer.showInMenuBar && s.location)
+  const countdown = (s.prayer.enabled && s.prayer.showInMenuBar
+                     && prayer.usableLocation(s.location))
     ? prayer.countdownLabel() : null;
 
   // Only macOS puts text beside a tray icon; on Windows it goes in the tooltip.
@@ -253,7 +269,7 @@ ipcMain.handle('cities:search', (_e, query) => cities.search(query));
 
 ipcMain.handle('prayer:today', () => {
   const s = store.load();
-  if (!s.location) return null;
+  if (!prayer.usableLocation(s.location)) return null;
   const times = prayer.timesFor(0);
   if (!times) return null;
   return {
@@ -309,6 +325,9 @@ app.whenReady().then(() => {
 
   tray = new Tray(trayImage(false));
   refreshTray();
+  // The menu is rebuilt as it opens; otherwise the countdown line and the
+  // next-prayer marker inside it are whatever they were at startup.
+  tray.on('mouse-down', refreshTray);
   if (!isMac) tray.on('click', () => tray.popUpContextMenu());
 
   // Refresh the countdown in the tooltip without rebuilding the menu every
@@ -316,7 +335,8 @@ app.whenReady().then(() => {
   setInterval(() => {
     if (!tray) return;
     const s = store.load();
-    const countdown = (s.prayer.enabled && s.prayer.showInMenuBar && s.location)
+    const countdown = (s.prayer.enabled && s.prayer.showInMenuBar
+                       && prayer.usableLocation(s.location))
       ? prayer.countdownLabel() : null;
     if (isMac) tray.setTitle(countdown ? ` ${countdown}` : '');
     tray.setToolTip(countdown ? `Sakina — ${statusLine()} · ${countdown}`

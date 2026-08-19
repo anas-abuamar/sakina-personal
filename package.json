@@ -28,6 +28,7 @@
     "files": [
       "src/**/*",
       "assets/**/*",
+      "data/**/*",
       "package.json"
     ],
     "mac": {

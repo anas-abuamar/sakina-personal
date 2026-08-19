@@ -9,14 +9,14 @@ const store = require('./store');
 //   rtl       lay the primary line out right-to-left
 
 const ADHKAR = [
-  ['سُبْحَانَ اللهِ وَبِحَمْدِهِ', 'Subḥān Allāhi wa biḥamdih', 'Glory be to Allah, and praise be to Him'],
-  ['أَسْتَغْفِرُ اللهَ', 'Astaghfirullāh', 'I seek forgiveness from Allah'],
-  ['لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ', 'Lā ḥawla wa lā quwwata illā billāh', 'There is no might nor power except with Allah'],
+  ['سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', 'Subḥān Allāhi wa biḥamdih', 'Glory be to Allah, and praise be to Him'],
+  ['أَسْتَغْفِرُ اللَّهَ', 'Astaghfirullāh', 'I seek forgiveness from Allah'],
+  ['لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', 'Lā ḥawla wa lā quwwata illā billāh', 'There is no might nor power except with Allah'],
   ['الْحَمْدُ لِلَّهِ', 'Alḥamdu lillāh', 'All praise is due to Allah'],
-  ['سُبْحَانَ اللهِ الْعَظِيمِ', 'Subḥān Allāhi al-ʿAẓīm', 'Glory be to Allah, the Most Great'],
-  ['لَا إِلَٰهَ إِلَّا اللهُ', 'Lā ilāha illā Allāh', 'There is no god but Allah'],
+  ['سُبْحَانَ اللَّهِ الْعَظِيمِ', 'Subḥān Allāhi al-ʿAẓīm', 'Glory be to Allah, the Most Great'],
+  ['لَا إِلَٰهَ إِلَّا اللَّهُ', 'Lā ilāha illā Allāh', 'There is no god but Allah'],
   ['اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ', 'Allāhumma ṣalli ʿalā Muḥammad', 'O Allah, send blessings upon Muhammad'],
-  ['حَسْبِيَ اللهُ وَنِعْمَ الْوَكِيلُ', 'Ḥasbiya Allāhu wa niʿma al-wakīl', 'Allah is sufficient for me, and He is the best disposer of affairs'],
+  ['حَسْبِيَ اللَّهُ وَنِعْمَ الْوَكِيلُ', 'Ḥasbiya Allāhu wa niʿma al-wakīl', 'Allah is sufficient for me, and He is the best disposer of affairs'],
   ['اللَّهُمَّ أَعِنِّي عَلَىٰ ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ', 'Allāhumma aʿinnī ʿalā dhikrika wa shukrika wa ḥusni ʿibādatik', 'O Allah, help me to remember You, thank You, and worship You well'],
 ].map(([primary, secondary, meaning], i) => ({
   id: `adhkar-${i}`, pack: 'adhkar', primary, secondary, meaning, rtl: true,
@@ -27,13 +27,13 @@ const ADHKAR = [
 // so — putting words in a real person's mouth is not a rounding error.
 const QUOTES = [
   ['It is not that we have a short time to live, but that we waste a lot of it.',
-   'Seneca', 'On the Shortness of Life, c. 49 AD'],
-  ['Rest is not idleness, and to lie sometimes on the grass under trees on a summer’s day is by no means a waste of time.',
-   'John Lubbock', 'The Use of Life, 1894'],
+   'Seneca', 'On the Shortness of Life I.3 (trans. Costa)'],
+  ['Rest is not idleness, and to lie sometimes on the grass under the trees on a summer’s day, listening to the murmur of water, or watching the clouds float across the blue sky, is by no means waste of time.',
+   'John Lubbock', 'The Use of Life, 1894, ch. IV'],
   ['Almost everything will work again if you unplug it for a few minutes, including you.',
-   'Anne Lamott', ''],
+   'Anne Lamott', 'From a 2015 social media post; no published source'],
   ['Every now and then go away and have a little relaxation. When you come back to your work your judgement will be surer.',
-   'Leonardo da Vinci', 'A Treatise on Painting'],
+   'Leonardo da Vinci', 'Paraphrased from the Notebooks §530'],
   ['Great things are not done by impulse, but by a series of small things brought together.',
    'Vincent van Gogh', 'Letter to Theo van Gogh, 1882'],
   ['You could leave life right now. Let that determine what you do and say and think.',

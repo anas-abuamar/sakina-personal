@@ -117,8 +117,16 @@ break you'd rather have deferred, never a break that silently stops happening.
 ## Platform status
 
 **macOS** — developed and verified here. The overlay is confirmed reaching the
-screen at screen-saver level across every display and clearing afterwards, and
-the prayer engine is checked against known times for several cities.
+screen at screen-saver level across every display and clearing afterwards. The
+prayer engine has been checked against an independent NOAA solar-position
+implementation across 16 cities and 4 dates: every time agrees within about two
+minutes, and the result is byte-identical whatever timezone the machine itself
+is set to.
+
+Known limits: inside the polar circles the times are adhan's *Aqrab Balad*
+approximation — ordered and usable, but at Tromsø in December they compress into
+a 71-minute notional day (Dhuhr 11:43, Asr 11:47). That is inherent to the
+problem, not a bug, but do not rely on it above the Arctic Circle.
 
 **Windows** — built from the documented APIs but **not yet exercised on a
 Windows machine**. Everything except the presenting check is platform-neutral
@@ -156,7 +164,7 @@ To rebuild the city list, download `cities15000.txt`, `countryInfo.txt`, and
 then:
 
 ```bash
-node scripts/build-cities.js <dir-with-those-files> data/cities.json
+node scripts/build-cities.js <dir-with-those-files> data/cities.json.gz
 ```
 
 ## macos-native

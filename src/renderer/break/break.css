@@ -5,14 +5,22 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* The break screen does not load shared.css, so it needs its own copy of this:
+   any element given a display rule by its class otherwise ignores [hidden]. */
+[hidden] { display: none !important; }
+
 html, body {
   height: 100%;
   background: var(--bg);
   color: var(--ink);
   overflow: hidden;
   cursor: none;
+  /* The Latin UI faces carry no naskh, so on Windows the Segoe fallback stacks
+     shadda+fatha and the superscript alef in إِلَٰهَ badly — which matters for a
+     pack whose whole point is fully-vocalised text. */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display",
-               "Segoe UI", system-ui, sans-serif;
+               "Segoe UI", system-ui, "Geeza Pro", "Noto Naskh Arabic",
+               "Segoe UI Historic", "Traditional Arabic", Amiri, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -91,7 +99,12 @@ body.visible { opacity: 1; }
   margin-inline: auto;
   text-wrap: balance;
 }
-.primary[dir="rtl"] { line-height: 1.75; max-width: 46ch; }
+.primary[dir="rtl"] {
+  line-height: 1.9;
+  max-width: 46ch;
+  font-family: "Geeza Pro", "Noto Naskh Arabic", "Traditional Arabic", Amiri,
+               -apple-system, system-ui, serif;
+}
 
 .secondary {
   margin-top: 1.4vh;

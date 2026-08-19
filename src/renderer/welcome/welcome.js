@@ -49,7 +49,20 @@ function wirePrayer() {
     const query = e.target.value;
     const host = el('city-results');
     if (query.trim().length < 2) { host.replaceChildren(); return; }
-    const list = await window.rest.searchCities(query);
+    let list;
+    try {
+      list = await window.rest.searchCities(query);
+    } catch (err) {
+      // Without this the rejection is unhandled and the field just stops
+      // responding, with nothing on screen to say why.
+      const box = el('city-results');
+      box.replaceChildren();
+      const note = document.createElement('div');
+      note.className = 'result';
+      note.textContent = 'Could not load the place list.';
+      box.appendChild(note);
+      return;
+    }
     if (seq !== searchSeq) return;
     host.replaceChildren();
     for (const city of list) {
