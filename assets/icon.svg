@@ -1,0 +1,33 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2C3860"/>
+      <stop offset="1" stop-color="#0D1120"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.34" r="0.66">
+      <stop offset="0" stop-color="#8E9CFF" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#8E9CFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="228" ry="228" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="228" ry="228" fill="url(#glow)"/>
+
+  <!-- Countdown ring, opened at the top like a timer part-way through. -->
+  <g transform="rotate(-90 512 512)">
+    <circle cx="512" cy="512" r="286" fill="none"
+            stroke="#EEF2FF" stroke-opacity="0.16" stroke-width="30"/>
+    <circle cx="512" cy="512" r="286" fill="none"
+            stroke="#EEF2FF" stroke-width="30" stroke-linecap="round"
+            stroke-dasharray="1348 449"/>
+  </g>
+
+  <!-- A closed, resting eye. Nudged up so the lashes do not drag the
+       optical centre below the ring's. -->
+  <g fill="none" stroke="#EEF2FF" stroke-width="34" stroke-linecap="round" transform="translate(0 -36)">
+    <path d="M 372 486 Q 512 606 652 486"/>
+    <path d="M 442 545 L 420 592"/>
+    <path d="M 512 566 L 512 616"/>
+    <path d="M 582 545 L 604 592"/>
+  </g>
+</svg>

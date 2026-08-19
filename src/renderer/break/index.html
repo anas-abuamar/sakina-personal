@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;">
+  <title>Rest</title>
+  <link rel="stylesheet" href="break.css">
+</head>
+<body>
+  <main class="screen" id="screen">
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="ring-track" cx="100" cy="100" r="90"></circle>
+        <circle class="ring-progress" id="ring" cx="100" cy="100" r="90"></circle>
+      </svg>
+      <div class="count" id="count">20</div>
+    </div>
+
+    <h1 class="title" id="title">Look away</h1>
+    <p class="subtitle" id="subtitle"></p>
+
+    <section class="phrase" id="phrase" hidden>
+      <p class="primary" id="primary"></p>
+      <p class="secondary" id="secondary"></p>
+      <p class="meaning" id="meaning"></p>
+    </section>
+  </main>
+
+  <footer class="hint" id="hint">Press Esc to skip</footer>
+  <script src="break.js"></script>
+</body>
+</html>

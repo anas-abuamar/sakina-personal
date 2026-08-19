@@ -1,0 +1,8 @@
+node_modules/
+dist/
+shots/
+.DS_Store
+
+# Swift build products
+macos-native/.build/
+macos-native/build/

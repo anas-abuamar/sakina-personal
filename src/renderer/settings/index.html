@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;">
+  <title>Rest Settings</title>
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="titlebar"></div>
+  <div class="wrap">
+    <h1>Rest</h1>
+    <p class="muted">Eye breaks, on the 20-20-20 rule.</p>
+
+    <section>
+      <h2>Timing</h2>
+      <div class="card">
+        <div class="row">
+          <div class="label"><b>Remind me every</b><span>How long you work between breaks.</span></div>
+          <select id="interval"></select>
+        </div>
+        <div class="row">
+          <div class="label"><b>Break length</b><span>How long the screen stays covered.</span></div>
+          <select id="duration"></select>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>What to show</h2>
+      <div class="card">
+        <div class="row">
+          <div class="label"><b>Adhkar</b><span id="adhkar-count"></span></div>
+          <input type="checkbox" id="pack-adhkar">
+        </div>
+        <div class="row">
+          <div class="label"><b>Quotes</b><span id="quotes-count"></span></div>
+          <input type="checkbox" id="pack-quotes">
+        </div>
+        <div class="row">
+          <div class="label"><b>My own phrases</b><span id="custom-count"></span></div>
+          <input type="checkbox" id="pack-custom">
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>My phrases</h2>
+      <div class="card" id="custom-list"></div>
+      <div class="adder card">
+        <input type="text" id="c-primary" placeholder="Phrase (the main line)">
+        <div class="adder-row">
+          <input type="text" id="c-secondary" placeholder="Transliteration or author (optional)">
+          <input type="text" id="c-meaning" placeholder="Translation or source (optional)">
+        </div>
+        <div class="adder-row end">
+          <label class="inline"><input type="checkbox" id="c-rtl"> <span>Right-to-left</span></label>
+          <button class="primary" id="c-add">Add phrase</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Reminders at a set time</h2>
+      <p class="faint pad">Separate from the break cycle — these fire at a clock time.</p>
+      <div class="card" id="sched-list"></div>
+      <div class="adder card">
+        <div class="adder-row">
+          <input type="text" id="s-label" placeholder="What to remind you (e.g. Dhuhr)">
+          <input type="time" id="s-time" value="13:00">
+        </div>
+        <div class="days" id="s-days"></div>
+        <div class="adder-row end">
+          <label class="inline"><input type="checkbox" id="s-full"> <span>Cover the screen</span></label>
+          <button class="primary" id="s-add">Add reminder</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Behaviour</h2>
+      <div class="card">
+        <div class="row">
+          <div class="label"><b>Skip when I'm away</b><span>No break if there's been no input for 5 minutes.</span></div>
+          <input type="checkbox" id="skipWhenAway">
+        </div>
+        <div class="row">
+          <div class="label"><b>Wait while presenting</b><span id="presenting-note"></span></div>
+          <input type="checkbox" id="waitWhilePresenting">
+        </div>
+        <div class="row">
+          <div class="label"><b>Strict mode</b><span>Remove the Esc shortcut so a break can't be skipped.</span></div>
+          <input type="checkbox" id="strictMode">
+        </div>
+        <div class="row">
+          <div class="label"><b>Play a sound</b><span>A chime when a break starts.</span></div>
+          <input type="checkbox" id="playSound">
+        </div>
+        <div class="row">
+          <div class="label"><b>Launch at login</b><span>Start Rest automatically when you sign in.</span></div>
+          <input type="checkbox" id="launchAtLogin">
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <button id="preview">Preview a break</button>
+      <button class="ghost" id="reveal">Show settings file</button>
+      <span class="faint" id="version"></span>
+    </div>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>

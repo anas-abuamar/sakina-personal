@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;">
+  <title>Welcome to Rest</title>
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body>
+  <div class="titlebar"></div>
+  <div class="wrap narrow">
+    <div class="hero">
+      <img src="../../../build/icon.png" alt="" width="76" height="76">
+      <h1>Rest</h1>
+      <p class="muted">Every so often, every screen dims and asks you to look
+        at something far away. Twenty seconds later it lets you back.</p>
+    </div>
+
+    <section>
+      <h2>How often?</h2>
+      <div class="choices" id="intervals"></div>
+      <p class="faint pad">Optometrists suggest every 20 minutes. It's a floor, not a law —
+        pick what you'll actually keep.</p>
+    </section>
+
+    <section>
+      <h2>What should it show you?</h2>
+      <div class="card">
+        <div class="row">
+          <div class="label"><b>Adhkar</b><span>Short phrases in Arabic, with transliteration.</span></div>
+          <input type="checkbox" id="pack-adhkar" checked>
+        </div>
+        <div class="row">
+          <div class="label"><b>Quotes</b><span>Lines on rest and attention, with sources.</span></div>
+          <input type="checkbox" id="pack-quotes" checked>
+        </div>
+      </div>
+      <p class="faint pad">You can add your own phrases any time from Settings.</p>
+    </section>
+
+    <section>
+      <div class="card">
+        <div class="row">
+          <div class="label"><b>Launch at login</b><span>A reminder you have to start yourself isn't one.</span></div>
+          <input type="checkbox" id="launchAtLogin" checked>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="primary big" id="done">Start</button>
+      <p class="faint">Rest lives in your <span id="where">menu bar</span>. Nothing is sent anywhere.</p>
+    </div>
+  </div>
+  <script src="welcome.js"></script>
+</body>
+</html>

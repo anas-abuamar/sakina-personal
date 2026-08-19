@@ -1,0 +1,28 @@
+.titlebar { height: 26px; -webkit-app-region: drag; }
+.wrap.narrow { max-width: 480px; }
+.pad { padding: 8px 4px 0; }
+
+.hero { text-align: center; padding: 6px 0 10px; }
+.hero img { border-radius: 18px; margin-bottom: 12px; }
+.hero h1 { margin-bottom: 6px; }
+.hero .muted { max-width: 40ch; margin: 0 auto; }
+
+.choices { display: flex; gap: 8px; }
+.choice {
+  flex: 1;
+  padding: 13px 0;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  cursor: pointer;
+  user-select: none;
+}
+.choice b { display: block; font-size: 17px; font-weight: 600; }
+.choice span { display: block; font-size: 11.5px; color: var(--ink-faint); }
+.choice.on { border-color: var(--accent); background: var(--panel-hi); }
+.choice.on b { color: var(--accent); }
+
+.actions { margin-top: 30px; text-align: center; }
+button.big { padding: 11px 42px; font-size: 15px; }
+.actions .faint { margin-top: 12px; }
