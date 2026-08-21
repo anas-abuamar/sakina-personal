@@ -57,6 +57,44 @@ you type during a break lands nowhere instead of in your document.
 prayer times are computed locally and the city list ships with the app. Settings
 are a JSON file you can open from the settings window.
 
+## Why bother
+
+Short version: breaks probably help, but the popular numbers are not well supported. Sakina lets you set your own prompts and intervals because the evidence points at "take breaks that suit you" rather than at any specific rule.
+
+### Resting the eyes
+
+The 20-20-20 rule is advice from professional bodies, not a tested result. The American Academy of Ophthalmology (2023) says to "shift your eyes to look at an object at least 20 feet away, for at least 20 seconds" every 20 minutes ([aao.org](https://www.aao.org/eye-health/diseases/what-is-eye-strain)) while the same page notes that "Eye strain does not injure the eye and does not cause permanent damage."
+
+When the numbers were actually tested, they did not hold up. Johnson and Rosenfield (2023) had 30 people read on a tablet for 40 minutes with 20-second breaks every 5, 10, 20 or 40 minutes, and found "no significant effect of scheduled breaks on reported symptoms (P = .70), reading speed (P = .93), or task accuracy (P = .55)", concluding that "these results do not support the proposal of using 20-second scheduled breaks as a therapeutic intervention for digital eye strain" ([doi:10.1097/OPX.0000000000001971](https://doi.org/10.1097/OPX.0000000000001971)). A more recent crossover study found breaks beat no breaks and endorsed "the potential benefits of individualized and frequent breaks" (Redondo et al., 2025, [doi:10.1016/j.exer.2025.110463](https://doi.org/10.1016/j.exer.2025.110463)) but the significant effects came from 10-minute and self-paced schedules, not from the 20-minute arm.
+
+The most favourable trial (Talens-Estarelles et al., 2023) had 29 people use 20-20-20 reminders for two weeks with no control group, and even there "No changes on any ocular surface and tear film parameter were observed with the rule reminders" ([doi:10.1016/j.clae.2022.101744](https://doi.org/10.1016/j.clae.2022.101744)).
+
+What is solid is the mechanism, not the fix: blink rate drops from about 32 to about 11 blinks per minute during reading (Chidi-Egboka et al., 2023, [doi:10.1167/iovs.64.2.14](https://doi.org/10.1167/iovs.64.2.14)), and that happens with printed paper as much as with screens. Prompting people to blink more did not help either: "Increasing the mean blink rate to 23.5 blinks per minute by means of the audible tone did not produce a significant change in the symptom score" (Portello et al., 2013, [doi:10.1097/OPX.0b013e31828f09a7](https://doi.org/10.1097/OPX.0b013e31828f09a7)). The TFOS workshop report is blunt about how weak the intervention evidence is: "In general, interventions are not well established" (Wolffsohn et al., 2023, [doi:10.1016/j.jtos.2023.04.004](https://doi.org/10.1016/j.jtos.2023.04.004)).
+
+### Moving
+
+Discomfort does build up while you sit: "Over time, discomfort increased in all body areas" over two hours of seated computer work (Baker et al., 2018, [doi:10.3390/ijerph15081678](https://doi.org/10.3390/ijerph15081678)).
+
+Extra breaks are cheap. NIOSH's field study of 42 data-entry workers added 20 minutes of break time per day and reported that "These beneficial effects were obtained without reductions in data-entry performance" (Galinsky et al., 2000, [doi:10.1080/001401300184297](https://doi.org/10.1080/001401300184297)); their follow-up found "supplementary breaks reliably minimize discomfort and eyestrain without impairing productivity" (Galinsky et al., 2007, [doi:10.1002/ajim.20472](https://doi.org/10.1002/ajim.20472)). A GRADE-rated review agrees on the productivity half: "Moderate-quality evidence indicated that the use of breaks had no detrimental effect on work productivity" (Waongenngarm et al., 2018, [doi:10.1016/j.apergo.2017.12.003](https://doi.org/10.1016/j.apergo.2017.12.003)).
+
+Whether movement fixes your back is much less clear. Cochrane: "Currently available limited evidence does not show that interventions to increase standing or walking in the workplace reduced musculoskeletal symptoms among sedentary workers at short-, medium-, or long-term follow up" (Parry et al., 2019, [doi:10.1002/14651858.CD012487.pub2](https://doi.org/10.1002/14651858.CD012487.pub2)). A 2025 meta-analysis of computer prompts specifically found they do move people (about 12.5 fewer sitting minutes and about 1,030 more steps per workday) but that "Secondary outcomes included work-related, musculoskeletal, and cardiometabolic outcomes favouring computer prompts but not statistically significant" (Leppe-Zamora et al., 2025, [doi:10.1186/s12966-025-01781-0](https://doi.org/10.1186/s12966-025-01781-0)). And workers in the 2007 study "reported stretching during only 25% of conventional breaks and 39% of supplementary breaks" — people ignore the exercise part of a prompt.
+
+WHO backs the general idea without any timer value: "Adults should limit the amount of time spent being sedentary. Replacing sedentary time with physical activity of any intensity (including light intensity) provides health benefits" (WHO, 2020, [NBK566046](https://www.ncbi.nlm.nih.gov/books/NBK566046/)), while stating there is insufficient evidence to recommend a break frequency or duration.
+
+### Resting attention
+
+Micro-breaks help how you feel more than what you produce. A meta-analysis found "statistically significant but small effects of micro-breaks in boosting vigor …, reducing fatigue …, and a non-significant effect on increasing overall performance", with "Sub-groups analyses on performance types revealed significant effects only for tasks with less cognitive demands" (Albulescu et al., 2022, [doi:10.1371/journal.pone.0272460](https://doi.org/10.1371/journal.pone.0272460)).
+
+What seems to matter is switching, not idling. Ariga and Lleras (2011) found only a group that briefly switched to a different task avoided the usual decline in vigilance, concluding "In sum, vigilance decrements are not about an exhaustion of attention, they are about a loss of control over the contents of our thoughts" ([doi:10.1016/j.cognition.2010.12.007](https://doi.org/10.1016/j.cognition.2010.12.007)). Similarly: "Surprisingly, low cognitive demand tasks yielded a stronger incubation effect than did rest during an incubation period when solving linguistic insight problems" (Sio & Ormerod, 2009, [doi:10.1037/a0014212](https://doi.org/10.1037/a0014212)).
+
+Do not oversell the mind-wandering angle. A two-study replication attempt (N = 443) reported "we found no evidence for the claim that mind wandering during a creative-incubation interval facilitates a form of creativity associated with divergent thinking" (Murray et al., 2024, [doi:10.1037/aca0000420](https://doi.org/10.1037/aca0000420)). "Look at something green" is on similarly thin ice: a review of Attention Restoration Theory ran meta-analyses on objective attention measures and found "The remaining 10 meta-analyses did not show marked beneficial effects" (Ohly et al., 2016, [doi:10.1080/10937404.2016.1196155](https://doi.org/10.1080/10937404.2016.1196155)).
+
+### Limits of all of the above
+
+Nearly every study here is small (n = 20 to 51 is typical), single-site, and short (one 40-minute session in several cases). Most outcomes are self-reported symptom questionnaires, not clinical signs. Very few are randomised controlled trials, and where reviews exist they say so themselves: a review of breaks and computer work noted "Some studies reported on productivity levels after exercise and/or rest breaks, but the findings appeared to be inconsistent", and its independent CRD assessors judged that its "authors' conclusions should be interpreted with caution and may not be reliable" ([DARE record NBK73578](https://www.ncbi.nlm.nih.gov/books/NBK73578/)). The eye-strain literature also lacks an agreed definition of the condition: pooled prevalence is 69.0% but with I2 of 99.7% and study estimates ranging "from 12.1 to 97.3% across studies" (Ccami-Bernal et al., 2024, [doi:10.1016/j.optom.2023.100482](https://doi.org/10.1016/j.optom.2023.100482)).
+
+Nothing here identifies an optimal interval. Sakina ships defaults, not evidence-based numbers, which is why every prompt and every interval is yours to change.
+
 ## Prayer times
 
 Computed on-device with [adhan](https://github.com/batoulapps/adhan-js), so they
@@ -200,6 +238,10 @@ native thing on a Mac; ignore it otherwise.
 
 ## Credits
 
+- The papers quoted under [Why bother](#why-bother) belong to their authors;
+  each quote links to its DOI. Every one was checked against the source rather
+  than quoted from memory, and one candidate was dropped for being a
+  meaning-altering truncation.
 - Prayer times: [adhan-js](https://github.com/batoulapps/adhan-js) by Batoul Apps (MIT).
 - City data: [GeoNames](https://www.geonames.org), licensed
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
