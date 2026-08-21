@@ -211,6 +211,26 @@ function promptMenuItems() {
   ];
 }
 
+function prayerMenuItems() {
+  const s = store.load();
+  if (!s.prayer.enabled || !prayer.usableLocation(s.location)) return [];
+  const times = prayer.timesFor(0);
+  if (!times) return [];
+
+  const upcoming = prayer.next();
+  const items = times.map((p) => ({
+    label: `${p.notAPrayer ? '  ' : ''}${p.name}${'\u2003'}${prayer.formatTime(p.time, s.location.tz)}` +
+           (upcoming && upcoming.key === p.key ? '   ←' : ''),
+    enabled: false,
+  }));
+
+  return [
+    { type: 'separator' },
+    { label: `${s.location.name} · ${prayer.countdownLabel() || ''}`, enabled: false },
+    ...items,
+  ];
+}
+
 function refreshTray() {
   if (!tray) return;
   tray.setImage(trayImage(scheduler.paused));
