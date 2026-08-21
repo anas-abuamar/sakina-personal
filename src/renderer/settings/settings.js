@@ -2,8 +2,8 @@
 
 const el = (id) => document.getElementById(id);
 const DAY_NAMES = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-const INTERVALS = [15, 20, 25, 30, 45, 60];
-const DURATIONS = [20, 30, 45, 60];
+const INTERVALS = [5, 10, 15, 20, 25, 30, 45, 60, 90, 120, 180];
+const DURATIONS = [10, 20, 30, 45, 60, 90, 120];
 
 let state = null;
 let draftDays = [];
@@ -33,6 +33,109 @@ function fillSelect(node, values, current, format) {
     opt.value = String(value);
     if (value === current) opt.selected = true;
     node.appendChild(opt);
+  }
+}
+
+/** Text fields save on a short delay: committing on every keystroke would
+ *  write settings.json and re-arm the scheduler once per character. */
+let promptSaveTimer = null;
+function savePromptsSoon(prompts) {
+  if (promptSaveTimer) clearTimeout(promptSaveTimer);
+  state.settings.prompts = prompts;
+  promptSaveTimer = setTimeout(() => { commitQuiet({ prompts }); }, 450);
+}
+
+async function commitQuiet(patch) {
+  state.settings = await window.rest.set(patch);
+}
+
+function renderPrompts() {
+  const host = el('prompt-list');
+  host.replaceChildren();
+
+  state.settings.prompts.forEach((p, index) => {
+    const card = make('div', `prompt${p.enabled ? '' : ' off'}`);
+
+    const head = make('div', 'prompt-head');
+    const title = document.createElement('input');
+    title.type = 'text';
+    title.value = p.title;
+    title.placeholder = 'What to do — e.g. Stand up and walk';
+    title.addEventListener('input', () => {
+      const next = state.settings.prompts.map((x, i) =>
+        (i === index ? { ...x, title: title.value } : x));
+      savePromptsSoon(next);
+    });
+
+    const on = document.createElement('input');
+    on.type = 'checkbox';
+    on.checked = !!p.enabled;
+    on.title = 'Enable this prompt';
+    on.addEventListener('change', () => commit({
+      prompts: state.settings.prompts.map((x, i) =>
+        (i === index ? { ...x, enabled: on.checked } : x)),
+    }));
+
+    head.append(title, on);
+
+    const sub = document.createElement('input');
+    sub.type = 'text';
+    sub.value = p.subtitle || '';
+    sub.placeholder = 'A line underneath (optional)';
+    sub.addEventListener('input', () => {
+      const next = state.settings.prompts.map((x, i) =>
+        (i === index ? { ...x, subtitle: sub.value } : x));
+      savePromptsSoon(next);
+    });
+
+    const when = make('div', 'prompt-when');
+    const everyLabel = make('label');
+    everyLabel.appendChild(document.createTextNode('every'));
+    const every = document.createElement('select');
+    fillSelect(every, INTERVALS, p.intervalMin, (v) => (v < 60 ? `${v} min` : `${v / 60} hr`));
+    every.addEventListener('change', () => commit({
+      prompts: state.settings.prompts.map((x, i) =>
+        (i === index ? { ...x, intervalMin: Number(every.value) } : x)),
+    }));
+    everyLabel.appendChild(every);
+
+    const forLabel = make('label');
+    forLabel.appendChild(document.createTextNode('for'));
+    const dur = document.createElement('select');
+    fillSelect(dur, DURATIONS, p.durationSec, (v) => `${v} sec`);
+    dur.addEventListener('change', () => commit({
+      prompts: state.settings.prompts.map((x, i) =>
+        (i === index ? { ...x, durationSec: Number(dur.value) } : x)),
+    }));
+    forLabel.appendChild(dur);
+    when.append(everyLabel, forLabel);
+
+    const foot = make('div', 'prompt-foot');
+    const phraseLabel = make('label', 'inline');
+    const phrase = document.createElement('input');
+    phrase.type = 'checkbox';
+    phrase.checked = p.showPhrase !== false;
+    phrase.addEventListener('change', () => commit({
+      prompts: state.settings.prompts.map((x, i) =>
+        (i === index ? { ...x, showPhrase: phrase.checked } : x)),
+    }));
+    phraseLabel.append(phrase, make('span', null, 'Show a phrase'));
+
+    const preview = make('button', 'link', 'Preview');
+    preview.addEventListener('click', () => window.rest.preview(p.id));
+
+    const remove = make('button', 'icon', 'Remove');
+    remove.addEventListener('click', () => commit({
+      prompts: state.settings.prompts.filter((_, i) => i !== index),
+    }));
+
+    foot.append(phraseLabel, make('div', 'spacer'), preview, remove);
+    card.append(head, sub, when, foot);
+    host.appendChild(card);
+  });
+
+  if (!state.settings.prompts.length) {
+    host.appendChild(make('div', 'empty', 'No prompts yet — add one below.'));
   }
 }
 
@@ -209,15 +312,10 @@ function renderPrayer() {
 function render() {
   const s = state.settings;
 
-  fillSelect(el('interval'), INTERVALS, s.workIntervalMin, (v) => `${v} minutes`);
-  fillSelect(el('duration'), DURATIONS, s.breakDurationSec, (v) => `${v} seconds`);
-
   el('adhkar-count').textContent = `${state.builtIn.adhkar.length} short phrases in Arabic.`;
-  el('quotes-count').textContent = `${state.builtIn.quotes.length} lines on rest and attention.`;
   el('custom-count').textContent = `${s.customPhrases.length} added.`;
 
   el('pack-adhkar').checked = s.packs.adhkar;
-  el('pack-quotes').checked = s.packs.quotes;
   el('pack-custom').checked = s.packs.custom;
 
   for (const key of ['skipWhenAway', 'waitWhilePresenting', 'strictMode', 'playSound', 'launchAtLogin']) {
@@ -230,6 +328,7 @@ function render() {
 
   el('version').textContent = `Sakina ${state.version}`;
 
+  renderPrompts();
   renderCustom();
   renderScheduled();
   renderDayPicker();
@@ -237,12 +336,7 @@ function render() {
 }
 
 function wire() {
-  el('interval').addEventListener('change', (e) =>
-    commit({ workIntervalMin: Number(e.target.value) }));
-  el('duration').addEventListener('change', (e) =>
-    commit({ breakDurationSec: Number(e.target.value) }));
-
-  for (const [id, key] of [['pack-adhkar', 'adhkar'], ['pack-quotes', 'quotes'], ['pack-custom', 'custom']]) {
+  for (const [id, key] of [['pack-adhkar', 'adhkar'], ['pack-custom', 'custom']]) {
     el(id).addEventListener('change', (e) =>
       commit({ packs: { ...state.settings.packs, [key]: e.target.checked } }));
   }
@@ -324,6 +418,20 @@ function wire() {
       return;
     }
     if (seq === searchSeq) renderCityResults(list);
+  });
+
+  el('prompt-add').addEventListener('click', () => {
+    commit({
+      prompts: [...state.settings.prompts, {
+        id: uid(),
+        title: '',
+        subtitle: '',
+        intervalMin: 30,
+        durationSec: 30,
+        showPhrase: false,
+        enabled: true,
+      }],
+    });
   });
 
   el('preview').addEventListener('click', () => window.rest.preview());

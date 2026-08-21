@@ -12,32 +12,23 @@
   <div class="titlebar"></div>
   <div class="wrap">
     <h1>Sakina</h1>
-    <p class="muted">Eye breaks, on the 20-20-20 rule.</p>
+    <p class="muted">Your prompts, on your intervals.</p>
 
     <section>
-      <h2>Timing</h2>
-      <div class="card">
-        <div class="row">
-          <div class="label"><b>Remind me every</b><span>How long you work between breaks.</span></div>
-          <select id="interval"></select>
-        </div>
-        <div class="row">
-          <div class="label"><b>Break length</b><span>How long the screen stays covered.</span></div>
-          <select id="duration"></select>
-        </div>
-      </div>
+      <h2>Prompts</h2>
+      <p class="faint pad">Each prompt has its own clock. Write your own words —
+        look away, stand up, put the phone down, describe what you just read.</p>
+      <div id="prompt-list"></div>
+      <button id="prompt-add">Add a prompt</button>
     </section>
 
     <section>
-      <h2>What to show</h2>
+      <h2>Phrases shown during a prompt</h2>
+      <p class="faint pad">Only shown for prompts with "Show a phrase" switched on.</p>
       <div class="card">
         <div class="row">
           <div class="label"><b>Adhkar</b><span id="adhkar-count"></span></div>
           <input type="checkbox" id="pack-adhkar">
-        </div>
-        <div class="row">
-          <div class="label"><b>Quotes</b><span id="quotes-count"></span></div>
-          <input type="checkbox" id="pack-quotes">
         </div>
         <div class="row">
           <div class="label"><b>My own phrases</b><span id="custom-count"></span></div>
@@ -164,7 +155,7 @@
     </section>
 
     <div class="footer">
-      <button id="preview">Preview a break</button>
+      <button id="preview">Preview</button>
       <button class="ghost" id="reveal">Show settings file</button>
       <span class="faint" id="version"></span>
     </div>

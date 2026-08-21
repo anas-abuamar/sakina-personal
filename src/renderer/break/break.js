@@ -42,11 +42,7 @@ function paint(payload) {
     primary.textContent = p.primary;
     primary.setAttribute('dir', p.rtl ? 'rtl' : 'ltr');
     if (p.rtl) primary.lang = 'ar';
-    // Quotes read as attribution, so they get the dash; a transliteration
-    // under a dhikr would look wrong with one.
-    el('secondary').textContent = p.secondary
-      ? (p.pack === 'quotes' ? `\u2014 ${p.secondary}` : p.secondary)
-      : '';
+    el('secondary').textContent = p.secondary || '';
     el('meaning').textContent = p.meaning || '';
     el('phrase').hidden = false;
     fitPrimary(primary, p.primary);

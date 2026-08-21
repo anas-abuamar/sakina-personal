@@ -3,9 +3,9 @@ const store = require('./store');
 
 // Every phrase is normalised to the same shape so the break screen never has
 // to care which pack it came from:
-//   primary   the line you read (Arabic, a quote, your own text)
-//   secondary transliteration, or the person being quoted
-//   meaning   translation, or the work it comes from
+//   primary   the line you read (Arabic, or your own text)
+//   secondary transliteration, or whatever sits under the main line
+//   meaning   translation, or a longer note
 //   rtl       lay the primary line out right-to-left
 
 const ADHKAR = [
@@ -22,31 +22,7 @@ const ADHKAR = [
   id: `adhkar-${i}`, pack: 'adhkar', primary, secondary, meaning, rtl: true,
 }));
 
-// Sources are recorded rather than implied. Where a line is traditionally
-// attributed but has no verifiable source in the named author's work, it says
-// so — putting words in a real person's mouth is not a rounding error.
-const QUOTES = [
-  ['It is not that we have a short time to live, but that we waste a lot of it.',
-   'Seneca', 'On the Shortness of Life I.3 (trans. Costa)'],
-  ['Rest is not idleness, and to lie sometimes on the grass under the trees on a summer’s day, listening to the murmur of water, or watching the clouds float across the blue sky, is by no means waste of time.',
-   'John Lubbock', 'The Use of Life, 1894, ch. IV'],
-  ['Almost everything will work again if you unplug it for a few minutes, including you.',
-   'Anne Lamott', 'From a 2015 social media post; no published source'],
-  ['Every now and then go away and have a little relaxation. When you come back to your work your judgement will be surer.',
-   'Leonardo da Vinci', 'Paraphrased from the Notebooks §530'],
-  ['Great things are not done by impulse, but by a series of small things brought together.',
-   'Vincent van Gogh', 'Letter to Theo van Gogh, 1882'],
-  ['You could leave life right now. Let that determine what you do and say and think.',
-   'Marcus Aurelius', 'Meditations, Book 2 (trans. Hays)'],
-  ['Take rest; a field that has rested gives a bountiful crop.',
-   'Ovid', 'Traditionally attributed'],
-  ['Nature does not hurry, yet everything is accomplished.',
-   'Lao Tzu', 'Traditionally attributed; not found in the Tao Te Ching'],
-].map(([primary, secondary, meaning], i) => ({
-  id: `quote-${i}`, pack: 'quotes', primary, secondary, meaning, rtl: false,
-}));
-
-const BUILT_IN = { adhkar: ADHKAR, quotes: QUOTES };
+const BUILT_IN = { adhkar: ADHKAR };
 
 function custom() {
   return store.load().customPhrases.map((p, i) => ({
@@ -64,7 +40,6 @@ function active() {
   const s = store.load();
   const pool = [];
   if (s.packs.adhkar) pool.push(...ADHKAR);
-  if (s.packs.quotes) pool.push(...QUOTES);
   if (s.packs.custom) pool.push(...custom());
   return pool;
 }
@@ -86,4 +61,4 @@ function peek() {
   return pool[(store.load().cursor + 1) % pool.length];
 }
 
-module.exports = { BUILT_IN, active, advance, peek, ADHKAR, QUOTES };
+module.exports = { BUILT_IN, active, advance, peek, ADHKAR };

@@ -1,7 +1,7 @@
 {
   "name": "sakina",
   "version": "1.0.0",
-  "description": "Eye breaks and prayer times for macOS and Windows — a quiet pause on a timer, with adhkar, sourced quotes, and your own phrases.",
+  "description": "Write your own break prompts, each on its own interval, for macOS and Windows. Optional adhkar and offline prayer times.",
   "main": "src/main/index.js",
   "author": "Anas Abuamar",
   "license": "MIT",
@@ -11,7 +11,8 @@
     "icons": "node scripts/make-icons.js",
     "dist": "electron-builder",
     "dist:mac": "electron-builder --mac",
-    "dist:win": "electron-builder --win"
+    "dist:win": "electron-builder --win",
+    "test": "electron test/run.js"
   },
   "devDependencies": {
     "electron": "^43.4.1",

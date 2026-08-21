@@ -89,10 +89,10 @@ function wirePrayer() {
 
   el('done').addEventListener('click', () => {
     window.rest.finishWelcome({
+      // Seeds the first prompt's clock; everything about it stays editable.
       workIntervalMin: interval,
       packs: {
         adhkar: el('pack-adhkar').checked,
-        quotes: el('pack-quotes').checked,
         custom: true,
       },
       launchAtLogin: el('launchAtLogin').checked,

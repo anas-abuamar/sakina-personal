@@ -29,31 +29,38 @@ if (!app.requestSingleInstanceLock()) app.quit();
 
 // ---------------------------------------------------------------- breaks
 
-function startBreak() {
-  // The scheduler has already marked a break in progress by the time we get
-  // here. If something else owns the screen, Overlay.show() would return early
-  // without ever calling onFinish — leaving breakActive stuck true and killing
-  // every future eye break. Hand the clock back instead and retry shortly.
+function startPrompt(prompt) {
+  // The scheduler has already marked this prompt active. If something else owns
+  // the screen, Overlay.show() would return early without ever calling onFinish
+  // — leaving it stuck active and killing every future break. Hand the clock
+  // back instead and retry shortly.
   if (overlay.active) {
-    scheduler.snooze(60);
+    scheduler.snoozeAll(60);
     refreshTray();
     return;
   }
 
   const s = store.load();
-  const phrase = reminders.advance();
+  const phrase = prompt.showPhrase ? reminders.advance() : null;
   overlay.show(
     {
-      durationSec: s.breakDurationSec,
+      durationSec: prompt.durationSec,
       phrase,
       strictMode: s.strictMode,
       playSound: s.playSound,
-      title: 'Look away',
-      subtitle: 'Focus on something about 20 feet (6 m) away until the ring closes.',
+      title: prompt.title,
+      subtitle: prompt.subtitle,
     },
-    () => { scheduler.breakFinished(); refreshTray(); },
+    () => { scheduler.finished(prompt.id); refreshTray(); },
   );
   refreshTray();
+}
+
+/** Fire whichever prompt is next up, for "Take a Break Now" and the preview. */
+function startSoonestPrompt() {
+  const up = scheduler.nextUp();
+  const prompt = up ? up.prompt : store.load().prompts.find((p) => p.enabled);
+  if (prompt) startPrompt(prompt);
 }
 
 function fireScheduled(entry) {
@@ -181,29 +188,26 @@ function trayImage(paused) {
 
 function statusLine() {
   if (scheduler.paused) return 'Paused';
-  const left = scheduler.remaining();
-  if (left == null) return 'Break in progress';
-  if (left < 60) return `Next break in ${left}s`;
-  return `Next break in ${Math.ceil(left / 60)} min`;
+  const up = scheduler.nextUp();
+  if (!up) return 'No prompts enabled';
+  const left = up.seconds;
+  const when = left < 60 ? `${left}s` : `${Math.ceil(left / 60)} min`;
+  return `${up.prompt.title} in ${when}`;
 }
 
-function prayerMenuItems() {
-  const s = store.load();
-  if (!s.prayer.enabled || !prayer.usableLocation(s.location)) return [];
-  const times = prayer.timesFor(0);
-  if (!times) return [];
-
-  const upcoming = prayer.next();
-  const items = times.map((p) => ({
-    label: `${p.notAPrayer ? '  ' : ''}${p.name}${'\u2003'}${prayer.formatTime(p.time, s.location.tz)}` +
-           (upcoming && upcoming.key === p.key ? '   ←' : ''),
-    enabled: false,
-  }));
-
+/** Every enabled prompt and its own countdown, so the menu shows all the
+ *  clocks rather than just the soonest. */
+function promptMenuItems() {
+  const prompts = store.load().prompts.filter((p) => p.enabled);
+  if (prompts.length < 2) return [];
   return [
     { type: 'separator' },
-    { label: `${s.location.name} · ${prayer.countdownLabel() || ''}`, enabled: false },
-    ...items,
+    ...prompts.map((p) => {
+      const left = scheduler.remainingFor(p.id);
+      const when = left == null ? '—'
+        : left < 60 ? `${left}s` : `${Math.ceil(left / 60)} min`;
+      return { label: `${p.title}\u2003${when}`, enabled: false };
+    }),
   ];
 }
 
@@ -225,8 +229,8 @@ function refreshTray() {
   const menu = Menu.buildFromTemplate([
     { label: statusLine(), enabled: false },
     { type: 'separator' },
-    { label: 'Take a Break Now', click: () => { if (!overlay.active) startBreak(); } },
-    { label: 'Snooze 5 Minutes', click: () => { overlay.close(false); scheduler.snooze(300); refreshTray(); } },
+    { label: 'Take a Break Now', click: () => { if (!overlay.active) startSoonestPrompt(); } },
+    { label: 'Snooze 5 Minutes', click: () => { overlay.close(false); scheduler.snoozeAll(300); refreshTray(); } },
     {
       label: scheduler.paused ? 'Resume' : 'Pause',
       click: () => { if (!scheduler.paused) overlay.close(false); scheduler.setPaused(!scheduler.paused); refreshTray(); },
@@ -235,6 +239,7 @@ function refreshTray() {
     next
       ? { label: `Next: ${(next.secondary || next.primary).slice(0, 42)}`, enabled: false }
       : { label: 'No phrases enabled', enabled: false },
+    ...promptMenuItems(),
     ...prayerMenuItems(),
     { type: 'separator' },
     { label: 'Settings…', click: openSettings },
@@ -247,17 +252,14 @@ function refreshTray() {
 
 ipcMain.handle('settings:get', () => ({
   settings: store.load(),
-  builtIn: { adhkar: reminders.ADHKAR, quotes: reminders.QUOTES },
+  builtIn: { adhkar: reminders.ADHKAR },
   platform: process.platform,
   version: app.getVersion(),
 }));
 
 ipcMain.handle('settings:set', (_e, patch) => {
-  const before = store.load();
   const after = store.save(patch);
-  if (patch.workIntervalMin != null && patch.workIntervalMin !== before.workIntervalMin) {
-    scheduler.reset();
-  }
+  if (patch.prompts) scheduler.resetAll();
   if (patch.launchAtLogin != null) {
     app.setLoginItemSettings({ openAtLogin: !!patch.launchAtLogin, openAsHidden: true });
   }
@@ -284,19 +286,29 @@ ipcMain.handle('prayer:today', () => {
 
 ipcMain.handle('prayer:methods', () => prayer.METHODS);
 
-ipcMain.handle('settings:preview', () => { if (!overlay.active) startBreak(); });
+ipcMain.handle('settings:preview', (_e, id) => {
+  if (overlay.active) return;
+  const prompt = store.load().prompts.find((p) => p.id === id);
+  if (prompt) startPrompt(prompt); else startSoonestPrompt();
+});
 ipcMain.handle('settings:openDataFile', () => shell.showItemInFolder(store.file()));
 ipcMain.handle('welcome:done', (_e, patch) => {
   // The welcome screen sends only the handful of fields it asks about, so the
   // nested prayer object is merged rather than replaced.
   const merged = { ...patch, firstRunComplete: true };
   if (patch.prayer) merged.prayer = { ...store.load().prayer, ...patch.prayer };
+  // The welcome screen asks for one interval; it belongs to the first prompt.
+  if (patch.workIntervalMin != null) {
+    const prompts = store.load().prompts.slice();
+    if (prompts.length) prompts[0] = { ...prompts[0], intervalMin: patch.workIntervalMin };
+    merged.prompts = prompts;
+  }
   if (patch.location == null) delete merged.location;
   store.save(merged);
   if (patch.launchAtLogin != null) {
     app.setLoginItemSettings({ openAtLogin: !!patch.launchAtLogin, openAsHidden: true });
   }
-  scheduler.reset();
+  scheduler.resetAll();
   refreshTray();
   if (welcomeWindow && !welcomeWindow.isDestroyed()) welcomeWindow.close();
 });
@@ -314,7 +326,7 @@ app.whenReady().then(() => {
   if (isMac) app.dock?.hide(); // menu-bar app, no Dock icon
   if (!isMac) app.setAppUserModelId('com.anasabuamar.sakina');
 
-  scheduler = new Scheduler({ onBreakDue: startBreak, onChange: () => {} });
+  scheduler = new Scheduler({ onDue: startPrompt, onChange: () => {} });
   scheduler.start();
 
   scheduledReminders = new ScheduledReminders(fireScheduled);

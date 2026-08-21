@@ -12,8 +12,18 @@ const root = path.join(__dirname, '..');
 
 const state = {
   settings: {
-    workIntervalMin: 20, breakDurationSec: 20,
-    packs: { adhkar: true, quotes: true, custom: true },
+    prompts: [
+      { id: 'default-eyes', title: 'Look away',
+        subtitle: 'Focus on something about 20 feet (6 m) away until the ring closes.',
+        intervalMin: 20, durationSec: 20, showPhrase: true, enabled: true },
+      { id: 'p2', title: 'Stand up and walk',
+        subtitle: 'Out of the chair. Anywhere that is not this desk.',
+        intervalMin: 60, durationSec: 60, showPhrase: false, enabled: true },
+      { id: 'p3', title: 'Say what you just read, out loud',
+        subtitle: 'If you cannot, you were not reading it.',
+        intervalMin: 90, durationSec: 30, showPhrase: false, enabled: false },
+    ],
+    packs: { adhkar: true, custom: true },
     customPhrases: [
       { id: 'a', primary: 'اللَّهُمَّ بَارِكْ لِي فِي وَقْتِي', secondary: 'Allāhumma bārik lī fī waqtī', meaning: 'O Allah, bless my time', rtl: true },
       { id: 'b', primary: 'Ship it, then rest.', secondary: 'me, 2 a.m.', meaning: '', rtl: false },
@@ -32,7 +42,7 @@ const state = {
       style: 'notification', preWarnMin: 10, showInMenuBar: true,
     },
   },
-  builtIn: { adhkar: reminders.ADHKAR, quotes: reminders.QUOTES },
+  builtIn: { adhkar: reminders.ADHKAR },
   platform: process.platform,
   version: '1.1.0',
 };
@@ -64,10 +74,10 @@ const shots = [
     subtitle: 'Focus on something about 20 feet (6 m) away until the ring closes.',
     phrase: reminders.ADHKAR[8],
   }],
-  ['break-quote', 'src/renderer/break/index.html', 1440, 900, {
-    durationSec: 20, strictMode: false, title: 'Look away',
-    subtitle: 'Focus on something about 20 feet (6 m) away until the ring closes.',
-    phrase: reminders.QUOTES[1],
+  ['break-walk', 'src/renderer/break/index.html', 1440, 900, {
+    durationSec: 60, strictMode: false, title: 'Stand up and walk',
+    subtitle: 'Out of the chair. Anywhere that is not this desk.',
+    phrase: null,
   }],
   ['settings', 'src/renderer/settings/index.html', 720, 860, null],
   ['welcome', 'src/renderer/welcome/index.html', 640, 860, null],

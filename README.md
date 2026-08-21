@@ -5,18 +5,21 @@
 </div>
 
 Sakina is a menu-bar / system-tray app for **macOS and Windows** that interrupts
-you on purpose. Every twenty minutes or so, every display dims, a ring counts
-down, and a phrase sits underneath it — an Arabic dhikr, a line on rest and
-attention, or something you wrote yourself. When the ring closes, it lets you
-back.
+you on purpose. You write the prompts and set how often each one fires. Every
+display dims, a ring counts down, and your own words sit in the middle of it.
+
+*Look away* every 20 minutes. *Stand up and walk* every hour. *Say what you just
+read, out loud* every 90 minutes. Each on its own clock, in your own words.
 
 It also knows the five prayer times where you are, and can tell you before each
 one arrives.
 
-Both halves exist for the same reason: nothing about staring at a screen
-reminds you to stop staring at a screen.
+All of it exists for one reason: nothing about staring at a screen reminds you
+to stop staring at a screen.
 
 ![A break screen showing a dhikr](docs/screenshots/break-adhkar.png)
+
+![A custom movement prompt](docs/screenshots/break-walk.png)
 
 ## Install
 
@@ -40,9 +43,9 @@ on Windows SmartScreen.
 
 | | |
 | --- | --- |
-| **Eye breaks** | Every 15–60 min, for 20–60 seconds. Every display, above full-screen apps. |
+| **Your prompts** | Any words you like, each with its own interval and length. Every display, above full-screen apps. |
 | **Prayer times** | Fajr through Isha for your city, with a heads-up before each. |
-| **Phrases** | 9 adhkar with transliteration, 8 sourced quotes, plus anything you add. |
+| **Phrases** | 9 adhkar with transliteration, plus anything you add, shown under a prompt. |
 | **Timed reminders** | Your own, at a clock time — as a notification or a full screen. |
 | **Skips** | Won't interrupt you when you're away, presenting, or on a call. |
 | **Strict mode** | Removes the Esc shortcut when you don't trust yourself. |
@@ -75,17 +78,24 @@ insensitive to accents, so *krako* finds *Kraków*. The list loads on first
 search rather than at startup — a tray app has no business parsing two megabytes
 to show a menu.
 
-## The phrases
+## Prompts
 
-Three packs, each switchable, rotating **in order** so you see the whole set
-instead of the same two lines all morning.
+A prompt is a title, an optional line underneath, an interval, and a duration.
+That is the whole model. The default one says *Look away* every 20 minutes for
+20 seconds, and every part of it is editable, including the words.
 
-- **Adhkar** — short enough to say two or three times with your eyes off the
-  screen, shown with transliteration and translation.
-- **Quotes** — every line carries its source. Where something is only
-  *traditionally* attributed, it says so rather than implying a citation that
-  doesn't exist.
+Each prompt runs its own clock, so they drift in and out of step naturally.
+When two come due at once only one fires; the other waits a couple of minutes
+rather than stacking a second full-screen overlay on top of the first.
+
+A prompt can optionally show a rotating **phrase** underneath its title:
+
+- **Adhkar** — 9 short phrases in Arabic, with transliteration and translation,
+  short enough to say two or three times with your eyes off the screen.
 - **Your own** — any text, with an optional right-to-left toggle.
+
+Phrases rotate **in order** so you see the whole set instead of the same two
+lines all morning.
 
 ## The two guards
 
@@ -138,9 +148,15 @@ Windows itself needs nothing extra.
 
 ```bash
 npm start                        # run it
+npm test                         # the test suite (runs under Electron)
 npm run icons                    # regenerate icons from assets/*.svg
 npx electron scripts/shoot.js    # screenshot every window to shots/
 ```
+
+Every case in `test/run.js` is there because something was actually broken —
+Isha silently never firing in London, no alerts at all at UTC+14, the scheduler
+wedging permanently after an overlay collision. Run it before you touch the
+scheduler or the prayer engine.
 
 That last one matters more than it looks. The only other way to check the break
 screen is to black out every display and wait twenty seconds, which is useless
@@ -148,10 +164,11 @@ when you're iterating on a layout — it's how the phrase-sizing bug and a
 show/hide bug in these screenshots got caught.
 
 ```
-src/main/       scheduler, tray, overlay windows, prayer engine, presence checks
+src/main/       per-prompt scheduler, tray, overlay windows, prayer engine
 src/preload/    the narrow bridge into each renderer
 src/renderer/   break screen, settings, first-run
 data/           bundled city list (see Credits)
+test/           the suite behind `npm test`
 macos-native/   see below
 ```
 
@@ -177,8 +194,8 @@ instantly:
 cd macos-native && make run
 ```
 
-It has the breaks, the adhkar and the two guards — but no prayer times, custom
-phrases, timed reminders, or settings window. Keep it if you want the lighter
+It has one fixed break cycle, the adhkar and the two guards — but no custom
+prompts, prayer times, timed reminders, or settings window. Keep it if you want the lighter
 native thing on a Mac; ignore it otherwise.
 
 ## Credits

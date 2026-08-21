@@ -3,10 +3,27 @@ const fs = require('fs');
 const path = require('path');
 const { app } = require('electron');
 
+// The one prompt every fresh install starts with. Everything about it is
+// editable, including the words — "Look away" is a default, not a fixture.
+const DEFAULT_PROMPT = {
+  id: 'default-eyes',
+  title: 'Look away',
+  subtitle: 'Focus on something about 20 feet (6 m) away until the ring closes.',
+  intervalMin: 20,
+  durationSec: 20,
+  showPhrase: true,
+  enabled: true,
+};
+
 const DEFAULTS = {
+  // Each prompt carries its own clock. See src/main/scheduler.js.
+  prompts: [{ ...DEFAULT_PROMPT }],
+
+  // Legacy single-timer fields. Kept only so an existing settings.json can be
+  // migrated into a prompt on first load; nothing reads them afterwards.
   workIntervalMin: 20,
   breakDurationSec: 20,
-  packs: { adhkar: true, quotes: true, custom: true },
+  packs: { adhkar: true, custom: true },
   customPhrases: [],
   cursor: -1,
   skipWhenAway: true,
@@ -34,6 +51,40 @@ const DEFAULTS = {
 let cache = null;
 const file = () => path.join(app.getPath('userData'), 'settings.json');
 
+/** Prompts, sanitised. An older settings.json has no `prompts` at all, so the
+ *  single interval it does have becomes the first prompt — nobody's existing
+ *  cadence is silently reset by upgrading. */
+function normalisePrompts(saved) {
+  const list = Array.isArray(saved.prompts) ? saved.prompts : null;
+
+  if (!list) {
+    const migrated = { ...DEFAULT_PROMPT };
+    if (Number.isFinite(Number(saved.workIntervalMin))) {
+      migrated.intervalMin = Number(saved.workIntervalMin);
+    }
+    if (Number.isFinite(Number(saved.breakDurationSec))) {
+      migrated.durationSec = Number(saved.breakDurationSec);
+    }
+    return [migrated];
+  }
+
+  const cleaned = list
+    .filter((p) => p && typeof p === 'object')
+    .map((p, i) => ({
+      id: typeof p.id === 'string' && p.id ? p.id : `prompt-${i}`,
+      title: String(p.title ?? '').slice(0, 120) || 'Take a break',
+      subtitle: String(p.subtitle ?? '').slice(0, 300),
+      // Clamped, because a zero interval fires a full-screen overlay on every
+      // tick forever and there is no way back out of that from the UI.
+      intervalMin: clamp(p.intervalMin, 1, 480, DEFAULT_PROMPT.intervalMin),
+      durationSec: clamp(p.durationSec, 3, 900, DEFAULT_PROMPT.durationSec),
+      showPhrase: p.showPhrase !== false,
+      enabled: p.enabled !== false,
+    }));
+
+  return cleaned.length ? cleaned : [{ ...DEFAULT_PROMPT }];
+}
+
 function clamp(value, min, max, fallback) {
   const n = Number(value);
   if (!Number.isFinite(n) || n < min || n > max) return fallback;
@@ -50,12 +101,11 @@ function merge(saved) {
   out.prayer.alerts = { ...DEFAULTS.prayer.alerts, ...((saved.prayer || {}).alerts || {}) };
   out.customPhrases = Array.isArray(saved.customPhrases) ? saved.customPhrases : [];
   out.scheduled = Array.isArray(saved.scheduled) ? saved.scheduled : [];
+  out.prompts = normalisePrompts(saved);
 
   // Scalars need range checks too, not just shape checks: a null or zero
   // workIntervalMin makes the scheduler compute nextAt = now and fire a
   // full-screen break on every single tick, forever.
-  out.workIntervalMin = clamp(out.workIntervalMin, 1, 240, DEFAULTS.workIntervalMin);
-  out.breakDurationSec = clamp(out.breakDurationSec, 3, 600, DEFAULTS.breakDurationSec);
   out.awayThresholdMin = clamp(out.awayThresholdMin, 1, 240, DEFAULTS.awayThresholdMin);
   out.prayer.preWarnMin = clamp(out.prayer.preWarnMin, 0, 120, DEFAULTS.prayer.preWarnMin);
   return out;
@@ -114,4 +164,4 @@ function write(value) {
   }
 }
 
-module.exports = { load, save, DEFAULTS, file };
+module.exports = { load, save, DEFAULTS, DEFAULT_PROMPT, file };
