@@ -72,7 +72,7 @@ const shots = [
   ['break-adhkar', 'src/renderer/break/index.html', 1440, 900, {
     durationSec: 20, strictMode: false, title: 'Look away',
     subtitle: 'Focus on something about 20 feet (6 m) away until the ring closes.',
-    phrase: reminders.ADHKAR[8],
+    phrase: reminders.SUNNAH[0],
   }],
   ['break-walk', 'src/renderer/break/index.html', 1440, 900, {
     durationSec: 60, strictMode: false, title: 'Stand up and walk',

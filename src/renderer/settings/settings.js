@@ -313,9 +313,12 @@ function render() {
   const s = state.settings;
 
   el('adhkar-count').textContent = `${state.builtIn.adhkar.length} short phrases in Arabic.`;
+  el('sunnah-count').textContent =
+    `${state.builtIn.sunnah.length} lines on rest and moderation, with references.`;
   el('custom-count').textContent = `${s.customPhrases.length} added.`;
 
   el('pack-adhkar').checked = s.packs.adhkar;
+  el('pack-sunnah').checked = s.packs.sunnah;
   el('pack-custom').checked = s.packs.custom;
 
   for (const key of ['skipWhenAway', 'waitWhilePresenting', 'strictMode', 'playSound', 'launchAtLogin']) {
@@ -336,7 +339,7 @@ function render() {
 }
 
 function wire() {
-  for (const [id, key] of [['pack-adhkar', 'adhkar'], ['pack-custom', 'custom']]) {
+  for (const [id, key] of [['pack-adhkar', 'adhkar'], ['pack-sunnah', 'sunnah'], ['pack-custom', 'custom']]) {
     el(id).addEventListener('change', (e) =>
       commit({ packs: { ...state.settings.packs, [key]: e.target.checked } }));
   }

@@ -272,7 +272,7 @@ function refreshTray() {
 
 ipcMain.handle('settings:get', () => ({
   settings: store.load(),
-  builtIn: { adhkar: reminders.ADHKAR },
+  builtIn: { adhkar: reminders.ADHKAR, sunnah: reminders.SUNNAH },
   platform: process.platform,
   version: app.getVersion(),
 }));

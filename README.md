@@ -4,6 +4,10 @@
   <p><em>Stillness, on a timer.</em></p>
 </div>
 
+> This is my own branch. It has everything the public one has, plus the two
+> things that are mine: the adhkar and Qur'an lines, and prayer times for
+> wherever I am. The general version lives on `main`.
+
 Sakina is a menu-bar / system-tray app for **macOS and Windows** that interrupts
 you on purpose. You write the prompts and set how often each one fires. Every
 display dims, a ring counts down, and your own words sit in the middle of it.
@@ -11,11 +15,36 @@ display dims, a ring counts down, and your own words sit in the middle of it.
 *Look away* every 20 minutes. *Stand up and walk* every hour. *Say what you just
 read, out loud* every 90 minutes. Each on its own clock, in your own words.
 
-It also knows the five prayer times where you are, and can tell you before each
-one arrives.
+It also knows the five prayer times where I am, and tells me before each one
+arrives.
 
-All of it exists for one reason: nothing about staring at a screen reminds you
-to stop staring at a screen.
+## Why I made this
+
+I kept meaning to take breaks and never did. Nothing about staring at a screen
+reminds you to stop staring at a screen, and a sticky note on the monitor lasts
+about a day.
+
+So I wrote something that interrupts me instead. Then I got curious whether the
+advice I was building on top of was even true, and started reading the actual
+papers rather than the blog posts about them. That is what
+[Why bother](#why-bother) is — I am still working through it, and I expect to
+spend a weekend or two more on it.
+
+What is already clear is that the 20-20-20 rule is much weaker than its
+popularity suggests. Someone did eventually test those exact numbers, and
+twenty-second breaks made no measurable difference to symptoms, reading speed or
+accuracy. The parts that hold up are less catchy: breaks do not cost you
+productivity, discomfort builds while you sit, your blink rate collapses while
+you read, and switching to a different task beats sitting idle if you want to
+keep concentrating.
+
+So the app has no opinion about your intervals. Write your own prompts, set your
+own timings, and change them when they stop working.
+
+The same instinct is why the prayer times are in here. The day already has a
+shape — five points that break it up whether or not I am paying attention. I
+would rather build my working rhythm around that than pretend the two are
+separate.
 
 ![A break screen showing a dhikr](docs/screenshots/break-adhkar.png)
 
@@ -89,11 +118,24 @@ What seems to matter is switching, not idling. Ariga and Lleras (2011) found onl
 
 Do not oversell the mind-wandering angle. A two-study replication attempt (N = 443) reported "we found no evidence for the claim that mind wandering during a creative-incubation interval facilitates a form of creativity associated with divergent thinking" (Murray et al., 2024, [doi:10.1037/aca0000420](https://doi.org/10.1037/aca0000420)). "Look at something green" is on similarly thin ice: a review of Attention Restoration Theory ran meta-analyses on objective attention measures and found "The remaining 10 meta-analyses did not show marked beneficial effects" (Ohly et al., 2016, [doi:10.1080/10937404.2016.1196155](https://doi.org/10.1080/10937404.2016.1196155)).
 
-### Limits of all of the above
+### What it adds up to
 
-Nearly every study here is small (n = 20 to 51 is typical), single-site, and short (one 40-minute session in several cases). Most outcomes are self-reported symptom questionnaires, not clinical signs. Very few are randomised controlled trials, and where reviews exist they say so themselves: a review of breaks and computer work noted "Some studies reported on productivity levels after exercise and/or rest breaks, but the findings appeared to be inconsistent", and its independent CRD assessors judged that its "authors' conclusions should be interpreted with caution and may not be reliable" ([DARE record NBK73578](https://www.ncbi.nlm.nih.gov/books/NBK73578/)). The eye-strain literature also lacks an agreed definition of the condition: pooled prevalence is 69.0% but with I2 of 99.7% and study estimates ranging "from 12.1 to 97.3% across studies" (Ccami-Bernal et al., 2024, [doi:10.1016/j.optom.2023.100482](https://doi.org/10.1016/j.optom.2023.100482)).
+Most of these studies are small. Twenty to fifty people, one site, often a
+single session under an hour. Most of what they measure is how people say they
+feel, not anything a clinician would check. The reviews hedge, and one had its
+own independent assessors write that its "authors' conclusions should be
+interpreted with caution and may not be reliable"
+([DARE record](https://www.ncbi.nlm.nih.gov/books/NBK73578/)). Even the basic
+prevalence figures wobble: pooled computer vision syndrome comes out at 69%, but
+the individual studies range "from 12.1 to 97.3%" (Ccami-Bernal et al., 2024,
+[doi:10.1016/j.optom.2023.100482](https://doi.org/10.1016/j.optom.2023.100482)).
 
-Nothing here identifies an optimal interval. Sakina ships defaults, not evidence-based numbers, which is why every prompt and every interval is yours to change.
+So none of this tells you when to take a break. The 20 in 20-20-20 was picked
+because it is easy to remember, and when someone finally tested those numbers,
+they did not do much.
+
+Which is why Sakina has no opinion about your intervals. Pick something you will
+actually keep, and change it when it stops working.
 
 ## Prayer times
 
@@ -130,7 +172,23 @@ A prompt can optionally show a rotating **phrase** underneath its title:
 
 - **Adhkar** — 9 short phrases in Arabic, with transliteration and translation,
   short enough to say two or three times with your eyes off the screen.
+- **Qur'an & Sunnah** — 6 lines on rest, the body's rights, and not
+  overburdening yourself, each with its reference.
 - **Your own** — any text, with an optional right-to-left toggle.
+
+Everything in that second pack was checked before it went in: wording, book and
+number, and grading. Four candidates were checked and **rejected**, which is
+worth recording because the first two are quoted constantly:
+
+| Rejected | Why |
+| --- | --- |
+| *"اعمل لدنياك كأنك تعيش أبداً…"* | Not a hadith. Al-Albani: *lā aṣla lahu marfūʿan* — no basis as a report from the Prophet. It is also about dunyā versus ākhira, so on a break screen it would read as *work harder*. |
+| *"خير الأمور أوسطها"* | Not established in the six books; authentic only as a *mawqūf* saying of Muṭarrif ibn ʿAbdullāh and Abū Qilāba. |
+| Qur'an 20:2 | Genuine, but addressed to the Prophet about revelation, and it ends mid-clause — the thought completes in 20:3. |
+| Qur'an 9:40 | The *sakīna* verse. Tempting given the name, but it is about the cave, not about rest. |
+
+If a line cannot be traced to a collection with a grading, it does not go on the
+screen. Getting this wrong matters more than shipping the feature.
 
 Phrases rotate **in order** so you see the whole set instead of the same two
 lines all morning.
