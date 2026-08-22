@@ -23,7 +23,7 @@ const DEFAULTS = {
   // migrated into a prompt on first load; nothing reads them afterwards.
   workIntervalMin: 20,
   breakDurationSec: 20,
-  packs: { adhkar: true, sunnah: true, custom: true },
+  packs: { adhkar: true, custom: true },
   customPhrases: [],
   cursor: -1,
   skipWhenAway: true,

@@ -172,23 +172,7 @@ A prompt can optionally show a rotating **phrase** underneath its title:
 
 - **Adhkar** — 9 short phrases in Arabic, with transliteration and translation,
   short enough to say two or three times with your eyes off the screen.
-- **Qur'an & Sunnah** — 6 lines on rest, the body's rights, and not
-  overburdening yourself, each with its reference.
 - **Your own** — any text, with an optional right-to-left toggle.
-
-Everything in that second pack was checked before it went in: wording, book and
-number, and grading. Four candidates were checked and **rejected**, which is
-worth recording because the first two are quoted constantly:
-
-| Rejected | Why |
-| --- | --- |
-| *"اعمل لدنياك كأنك تعيش أبداً…"* | Not a hadith. Al-Albani: *lā aṣla lahu marfūʿan* — no basis as a report from the Prophet. It is also about dunyā versus ākhira, so on a break screen it would read as *work harder*. |
-| *"خير الأمور أوسطها"* | Not established in the six books; authentic only as a *mawqūf* saying of Muṭarrif ibn ʿAbdullāh and Abū Qilāba. |
-| Qur'an 20:2 | Genuine, but addressed to the Prophet about revelation, and it ends mid-clause — the thought completes in 20:3. |
-| Qur'an 9:40 | The *sakīna* verse. Tempting given the name, but it is about the cave, not about rest. |
-
-If a line cannot be traced to a collection with a grading, it does not go on the
-screen. Getting this wrong matters more than shipping the feature.
 
 Phrases rotate **in order** so you see the whole set instead of the same two
 lines all morning.

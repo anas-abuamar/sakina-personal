@@ -23,7 +23,7 @@ const state = {
         subtitle: 'If you cannot, you were not reading it.',
         intervalMin: 90, durationSec: 30, showPhrase: false, enabled: false },
     ],
-    packs: { adhkar: true, sunnah: true, custom: true },
+    packs: { adhkar: true, custom: true },
     customPhrases: [
       { id: 'a', primary: 'اللَّهُمَّ بَارِكْ لِي فِي وَقْتِي', secondary: 'Allāhumma bārik lī fī waqtī', meaning: 'O Allah, bless my time', rtl: true },
       { id: 'b', primary: 'Ship it, then rest.', secondary: 'me, 2 a.m.', meaning: '', rtl: false },
@@ -38,11 +38,11 @@ const state = {
                 lat: 43.876, lon: -69.634, tz: 'America/New_York' },
     prayer: {
       enabled: true, method: 'NorthAmerica', madhab: 'shafi',
-      alerts: { fajr: true, dhuhr: true, asr: true, maghrib: false, isha: true },
+      alerts: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true },
       style: 'notification', preWarnMin: 10, showInMenuBar: true,
     },
   },
-  builtIn: { adhkar: reminders.ADHKAR, sunnah: reminders.SUNNAH },
+  builtIn: { adhkar: reminders.ADHKAR },
   platform: process.platform,
   version: '1.1.0',
 };
@@ -72,7 +72,7 @@ const shots = [
   ['break-adhkar', 'src/renderer/break/index.html', 1440, 900, {
     durationSec: 20, strictMode: false, title: 'Look away',
     subtitle: 'Focus on something about 20 feet (6 m) away until the ring closes.',
-    phrase: reminders.SUNNAH[0],
+    phrase: reminders.ADHKAR[0],
   }],
   ['break-walk', 'src/renderer/break/index.html', 1440, 900, {
     durationSec: 60, strictMode: false, title: 'Stand up and walk',

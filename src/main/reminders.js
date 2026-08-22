@@ -23,45 +23,7 @@ const ADHKAR = [
 }));
 
 
-// Verified line by line against sunnah.com and quran.com: wording, collection
-// number, and grading each checked before anything went in here. Deliberately
-// left OUT, having been checked and failed:
-//
-//   "اعمل لدنياك كأنك تعيش أبدا..."  Not a hadith. Al-Albani: la asla lahu
-//       marfu'an — no basis as a report from the Prophet. It circulates as a
-//       saying of Abdullah ibn Amr. It is also about dunya versus akhira, so on
-//       a break screen it would read as "work harder" — the opposite of this.
-//   "خير الأمور أوسطها"  Not established in the six books; authentic only as a
-//       mawquf saying of Mutarrif ibn Abdullah and Abu Qilaba.
-//   Qur'an 20:2  Genuine, but it is addressed to the Prophet about revelation,
-//       and it ends mid-clause — the thought completes in 20:3. Quoted alone on
-//       a screen it becomes generic reassurance the ayah does not offer.
-//   Qur'an 9:40  The sakina verse. Tempting, given the app's name, but it is
-//       about the cave and the Prophet's companion, not about rest.
-const SUNNAH = [
-  ['فَإِنَّ لِجَسَدِكَ عَلَيْكَ حَقًّا',
-   'Fa-inna li-jasadika ʿalayka ḥaqqan',
-   'Your body has a right over you. · Sahih al-Bukhari 1975'],
-  ['إِنَّ الدِّينَ يُسْرٌ',
-   'Inna al-dīna yusrun',
-   'Religion is easy. · Sahih al-Bukhari 39'],
-  ['وَأَنَّ أَحَبَّ الأَعْمَالِ أَدْوَمُهَا إِلَى اللَّهِ، وَإِنْ قَلَّ',
-   'Wa-anna aḥabba al-aʿmāli adwamuhā ilā Allāhi, wa-in qall',
-   'The most beloved deed to Allah is the most constant, even if little. · Sahih al-Bukhari 6464'],
-  ['وَجَعَلْنَا نَوْمَكُمْ سُبَاتًا',
-   'Wa-jaʿalnā nawmakum subātā',
-   'And made your sleep a means for rest. · Qur’an 78:9 (Saheeh International)'],
-  ['وَهُوَ ٱلَّذِى جَعَلَ لَكُمُ ٱلَّيْلَ لِبَاسًا وَٱلنَّوْمَ سُبَاتًا',
-   'Wa-huwa alladhī jaʿala lakumu al-layla libāsan wa-al-nawma subātā',
-   'And it is He who has made the night for you as clothing, and sleep a means for rest. · Qur’an 25:47 (Saheeh International)'],
-  ['وَمِن رَّحْمَتِهِۦ جَعَلَ لَكُمُ ٱلَّيْلَ وَٱلنَّهَارَ لِتَسْكُنُوا۟ فِيهِ',
-   'Wa-min raḥmatihi jaʿala lakumu al-layla wa-al-nahāra li-taskunū fīhi',
-   'In His mercy He has given you night and day, so that you may rest. · Qur’an 28:73 (Abdel Haleem)'],
-].map(([primary, secondary, meaning], i) => ({
-  id: `sunnah-${i}`, pack: 'sunnah', primary, secondary, meaning, rtl: true,
-}));
-
-const BUILT_IN = { adhkar: ADHKAR, sunnah: SUNNAH };
+const BUILT_IN = { adhkar: ADHKAR };
 
 function custom() {
   return store.load().customPhrases.map((p, i) => ({
@@ -79,7 +41,6 @@ function active() {
   const s = store.load();
   const pool = [];
   if (s.packs.adhkar) pool.push(...ADHKAR);
-  if (s.packs.sunnah) pool.push(...SUNNAH);
   if (s.packs.custom) pool.push(...custom());
   return pool;
 }
@@ -101,4 +62,4 @@ function peek() {
   return pool[(store.load().cursor + 1) % pool.length];
 }
 
-module.exports = { BUILT_IN, active, advance, peek, ADHKAR, SUNNAH };
+module.exports = { BUILT_IN, active, advance, peek, ADHKAR };
