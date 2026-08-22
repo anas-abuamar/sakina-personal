@@ -312,9 +312,12 @@ function renderPrayer() {
 function render() {
   const s = state.settings;
 
-  el('adhkar-count').textContent = `${state.builtIn.adhkar.length} short phrases in Arabic.`;
+  // Defensive: a missing pack must not throw out of render() and leave every
+  // other control on the page unset.
+  const packSize = (name) => ((state.builtIn && state.builtIn[name]) || []).length;
+  el('adhkar-count').textContent = `${packSize('adhkar')} short phrases in Arabic.`;
   el('sunnah-count').textContent =
-    `${state.builtIn.sunnah.length} lines on rest and moderation, with references.`;
+    `${packSize('sunnah')} lines on rest and moderation, with references.`;
   el('custom-count').textContent = `${s.customPhrases.length} added.`;
 
   el('pack-adhkar').checked = s.packs.adhkar;

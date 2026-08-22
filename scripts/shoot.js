@@ -23,7 +23,7 @@ const state = {
         subtitle: 'If you cannot, you were not reading it.',
         intervalMin: 90, durationSec: 30, showPhrase: false, enabled: false },
     ],
-    packs: { adhkar: true, custom: true },
+    packs: { adhkar: true, sunnah: true, custom: true },
     customPhrases: [
       { id: 'a', primary: 'اللَّهُمَّ بَارِكْ لِي فِي وَقْتِي', secondary: 'Allāhumma bārik lī fī waqtī', meaning: 'O Allah, bless my time', rtl: true },
       { id: 'b', primary: 'Ship it, then rest.', secondary: 'me, 2 a.m.', meaning: '', rtl: false },
@@ -34,15 +34,15 @@ const state = {
     ],
     skipWhenAway: true, waitWhilePresenting: true, strictMode: false,
     playSound: false, launchAtLogin: true, cursor: 0, firstRunComplete: true,
-    location: { name: 'Waterville', region: 'Maine', country: 'United States',
-                lat: 44.5521, lon: -69.6317, tz: 'America/New_York' },
+    location: { name: 'Boothbay', region: 'Maine', country: 'United States',
+                lat: 43.876, lon: -69.634, tz: 'America/New_York' },
     prayer: {
       enabled: true, method: 'NorthAmerica', madhab: 'shafi',
       alerts: { fajr: true, dhuhr: true, asr: true, maghrib: false, isha: true },
       style: 'notification', preWarnMin: 10, showInMenuBar: true,
     },
   },
-  builtIn: { adhkar: reminders.ADHKAR },
+  builtIn: { adhkar: reminders.ADHKAR, sunnah: reminders.SUNNAH },
   platform: process.platform,
   version: '1.1.0',
 };
@@ -52,7 +52,7 @@ const state = {
 const TZ = 'America/New_York';
 const params = adhan.CalculationMethod.NorthAmerica();
 params.madhab = adhan.Madhab.Shafi;
-const pt = new adhan.PrayerTimes(new adhan.Coordinates(44.5521, -69.6317), new Date(), params);
+const pt = new adhan.PrayerTimes(new adhan.Coordinates(43.876, -69.634), new Date(), params);
 const fmt = (d) => new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit', timeZone: TZ }).format(d);
 const prayerToday = {
   location: state.settings.location,
