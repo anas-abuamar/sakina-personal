@@ -327,6 +327,13 @@ function render() {
   for (const key of ['skipWhenAway', 'waitWhilePresenting', 'strictMode', 'playSound', 'launchAtLogin']) {
     el(key).checked = !!s[key];
   }
+  // macOS refuses to register a login item for an unsigned build, so say so
+  // rather than leaving a toggle that silently does nothing.
+  if (state.loginItemBlocked) {
+    el('login-note').textContent =
+      'macOS refused: this build is not signed. Add Sakina yourself under '
+      + 'System Settings \u203a General \u203a Login Items.';
+  }
 
   el('presenting-note').textContent = state.platform === 'darwin'
     ? 'Postpone while something holds the display awake — video, calls, screen sharing.'

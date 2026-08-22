@@ -121,6 +121,31 @@ function firePrayer(entry, isPreWarning) {
   }
 }
 
+
+/** True once macOS has refused to register the login item. An ad-hoc signed
+ *  build cannot use SMAppService — the API returns "Operation not permitted" —
+ *  so the toggle must not claim to be on when nothing happened. */
+let loginItemBlocked = false;
+
+function applyLoginItem(wanted) {
+  const want = !!wanted;
+  try {
+    if (app.getLoginItemSettings().openAtLogin !== want) {
+      app.setLoginItemSettings({ openAtLogin: want, openAsHidden: true });
+    }
+    const actual = app.getLoginItemSettings().openAtLogin;
+    loginItemBlocked = want && !actual;
+    // Write back what is really true, so the toggle reflects the OS.
+    if (actual !== want) store.save({ launchAtLogin: actual });
+    return actual;
+  } catch (err) {
+    loginItemBlocked = want;
+    console.error('could not set login item:', err && err.message);
+    if (want) store.save({ launchAtLogin: false });
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------- windows
 
 function createWindow(file, opts, ref) {
@@ -275,14 +300,13 @@ ipcMain.handle('settings:get', () => ({
   builtIn: { adhkar: reminders.ADHKAR, sunnah: reminders.SUNNAH },
   platform: process.platform,
   version: app.getVersion(),
+  loginItemBlocked,
 }));
 
 ipcMain.handle('settings:set', (_e, patch) => {
   const after = store.save(patch);
   if (patch.prompts) scheduler.resetAll();
-  if (patch.launchAtLogin != null) {
-    app.setLoginItemSettings({ openAtLogin: !!patch.launchAtLogin, openAsHidden: true });
-  }
+  if (patch.launchAtLogin != null) applyLoginItem(patch.launchAtLogin);
   refreshTray();
   return after;
 });
@@ -325,9 +349,7 @@ ipcMain.handle('welcome:done', (_e, patch) => {
   }
   if (patch.location == null) delete merged.location;
   store.save(merged);
-  if (patch.launchAtLogin != null) {
-    app.setLoginItemSettings({ openAtLogin: !!patch.launchAtLogin, openAsHidden: true });
-  }
+  if (patch.launchAtLogin != null) applyLoginItem(patch.launchAtLogin);
   scheduler.resetAll();
   refreshTray();
   if (welcomeWindow && !welcomeWindow.isDestroyed()) welcomeWindow.close();
@@ -345,6 +367,13 @@ app.on('browser-window-closed', maybeHideDock);
 app.whenReady().then(() => {
   if (isMac) app.dock?.hide(); // menu-bar app, no Dock icon
   if (!isMac) app.setAppUserModelId('com.anasabuamar.sakina');
+
+  // Reconcile the stored preference with what the OS actually has, and record
+  // whether the OS refused. Two things were wrong before: the setting was only
+  // written when the toggle changed, so a fresh install left settings claiming
+  // "launch at login" with no login item registered; and when macOS declined,
+  // the toggle went on reading "on" regardless.
+  applyLoginItem(store.load().launchAtLogin);
 
   scheduler = new Scheduler({ onDue: startPrompt, onChange: () => {} });
   scheduler.start();
